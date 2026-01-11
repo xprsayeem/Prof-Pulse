@@ -87,11 +87,16 @@ export default async function Home() {
       {/* Footer */}
       <footer className="border-t border-white/10 px-4 py-8">
         <div className="max-w-4xl mx-auto text-center text-white/30 text-sm">
-          <p>Data sourced from RateMyProfessors. Not affiliated with TMU.</p>
+          <p>
+            Data sourced from RateMyProfessors. Not affiliated with TMU.
+          </p>
           <p className="mt-2">
             Built by{" "}
-            <a href="https://github.com/xprsayeem" className="text-brand-blue hover:underline">
-              Sayeem Mahfuz
+            
+              href="https://github.com/yourusername"
+              className="text-brand-blue hover:underline"
+            >
+              Sayeem
             </a>
           </p>
         </div>
