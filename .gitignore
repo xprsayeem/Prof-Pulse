@@ -1,8 +1,9 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
-/.pnp
+node_modules
+frontend/node_modules/
+.pnp
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -14,8 +15,9 @@
 /coverage
 
 # next.js
-/.next/
-/out/
+.next/
+dist/
+out/
 
 # production
 /build
@@ -31,6 +33,7 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
+.env
 .env*
 .env.local
 .env.*.local
@@ -50,3 +53,11 @@ Thumbs.db
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+#databricks
+*.json
+*.parquet
+*.delta
+__pycache__/
+.ipynb_checkpoints/
+

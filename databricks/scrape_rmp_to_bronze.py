@@ -1,10 +1,11 @@
+# scrape_rmp.py - Full scrape of all TMU professors and their reviews
 import requests
 import json
 import time
 from datetime import datetime
 
 class TMUProfessorScraper:
-    """GraphQL Scraper for TMU professors"""
+    """Focused scraper for TMU professors only"""
     
     def __init__(self, school_id="U2Nob29sLTE0NzE="):
         self.school_id = school_id
@@ -125,34 +126,27 @@ class TMUProfessorScraper:
         
         return all_reviews
     
-    def scrape_all(self, sample_size=None):
+    def scrape_all(self):
         """Scrape all professors and their reviews"""
         
-        # Get professors
         professors = self.get_all_professors()
         
-        if sample_size:
-            professors = professors[:sample_size]
-            print(f"Testing with {sample_size} professors\n")
-        
-        # Get reviews for each professor
         print("Fetching reviews...")
         for i, prof in enumerate(professors, 1):
             name = f"{prof['firstName']} {prof['lastName']}"
             num_ratings = prof['numRatings']
             dept = prof.get('department', 'Unknown')
             
-            print(f"[{i}/{len(professors)}] {name} - {dept} ({num_ratings} reviews)")
+            if i % 50 == 0 or i == len(professors):
+                print(f"[{i}/{len(professors)}] Processing {name}")
             
             if num_ratings > 0:
                 prof['reviews'] = self.get_professor_reviews(prof['id'])
-                print(f"  ✓ Got {len(prof['reviews'])} reviews")
             else:
                 prof['reviews'] = []
             
             time.sleep(1)
         
-        # Build result
         result = {
             'metadata': {
                 'school': self.school_name,
@@ -167,39 +161,30 @@ class TMUProfessorScraper:
         return result
 
 
+# ============================================================
+# MAIN EXECUTION (Databricks)
+# ============================================================
+
 if __name__ == "__main__":
     print("=" * 60)
     print("TMU Professor Rating Scraper")
     print("=" * 60)
-    print()
     
     scraper = TMUProfessorScraper()
+    data = scraper.scrape_all()
     
-    # There are 3951 Professors at TMU
-    data = scraper.scrape_all(sample_size=3951)
-    
-    # Save
+    # Save to S3
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"tmu_professors_{timestamp}.json"
+    RAW_BUCKET_PATH = os.getenv("RAW_BUCKET_PATH", "s3://your-bucket/raw/")
     
-    with open(filename, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    # Write via dbutils (available in Databricks)
+    import json
+    dbutils.fs.put(s3_path, json.dumps(data, ensure_ascii=False), overwrite=True)
     
-    # Summary
     print(f"\n{'=' * 60}")
-    print("SCRAPE COMPLETE")
+    print("✓ SCRAPE COMPLETE")
     print(f"{'=' * 60}")
     print(f"Professors: {data['metadata']['total_professors']}")
     print(f"Total Reviews: {data['metadata']['total_reviews']}")
-    
-    # Show department breakdown
-    dept_counts = {}
-    for prof in data['professors']:
-        dept = prof.get('department', 'Unknown')
-        dept_counts[dept] = dept_counts.get(dept, 0) + 1
-    
-    print(f"\nDepartment Breakdown:")
-    for dept, count in sorted(dept_counts.items(), key=lambda x: x[1], reverse=True):
-        print(f"  {dept}: {count} professors")
-    
-    print(f"\nSaved to: {filename}")
+    print(f"Saved to: {s3_path}")
