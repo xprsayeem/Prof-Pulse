@@ -3,8 +3,6 @@
 import { CourseTrend } from "@/lib/types";
 import { motion } from "framer-motion";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   Tooltip,
@@ -16,6 +14,74 @@ import {
 
 interface CourseTrendsProps {
   trends: CourseTrend[];
+}
+
+type ChartPoint = {
+  year: number;
+  quality: number;
+  difficulty: number;
+  reviews: number;
+};
+
+// Custom tooltip component. Defined at module scope (not inside the parent
+// render) so it keeps a stable identity across renders. Recharts injects
+// active/payload/label; chartData is passed in explicitly.
+function CustomTooltip({
+  active,
+  payload,
+  label,
+  chartData,
+}: {
+  active?: boolean;
+  payload?: Array<{ value: number; dataKey: string; color: string }>;
+  label?: number;
+  chartData: ChartPoint[];
+}) {
+  if (active && payload && payload.length) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-black/95 border border-white/20 rounded-lg p-3 backdrop-blur-xl"
+      >
+        <p className="text-white font-medium mb-2">{label}</p>
+        {payload.map((entry, index) => (
+          <p key={index} className="text-sm" style={{ color: entry.color }}>
+            {entry.dataKey === "quality" ? "Quality" : "Difficulty"}:{" "}
+            <span className="font-medium">{entry.value?.toFixed(2)}</span>
+          </p>
+        ))}
+        <p className="text-white/40 text-xs mt-2">
+          {chartData.find((d) => d.year === label)?.reviews} reviews
+        </p>
+      </motion.div>
+    );
+  }
+  return null;
+}
+
+// Custom animated dot. Also module-scoped for a stable component identity.
+function AnimatedDot(props: { cx?: number; cy?: number; fill?: string; index?: number }) {
+  const { cx, cy, fill, index = 0 } = props;
+  if (cx === undefined || cy === undefined) return null;
+
+  return (
+    <motion.circle
+      cx={cx}
+      cy={cy}
+      r={4}
+      fill={fill}
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{
+        delay: 0.5 + index * 0.1,
+        type: "spring",
+        stiffness: 300,
+        damping: 15,
+      }}
+      style={{ filter: `drop-shadow(0 0 4px ${fill})` }}
+    />
+  );
 }
 
 export function CourseTrends({ trends }: CourseTrendsProps) {
@@ -35,55 +101,6 @@ export function CourseTrends({ trends }: CourseTrendsProps) {
   if (chartData.length < 2) {
     return null;
   }
-
-  // Custom tooltip component
-  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number; dataKey: string; color: string }>; label?: number }) => {
-    if (active && payload && payload.length) {
-      return (
-        <motion.div
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-black/95 border border-white/20 rounded-lg p-3 backdrop-blur-xl"
-        >
-          <p className="text-white font-medium mb-2">{label}</p>
-          {payload.map((entry, index) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.dataKey === "quality" ? "Quality" : "Difficulty"}:{" "}
-              <span className="font-medium">{entry.value?.toFixed(2)}</span>
-            </p>
-          ))}
-          <p className="text-white/40 text-xs mt-2">
-            {chartData.find(d => d.year === label)?.reviews} reviews
-          </p>
-        </motion.div>
-      );
-    }
-    return null;
-  };
-
-  // Custom animated dot
-  const AnimatedDot = (props: { cx?: number; cy?: number; fill?: string; index?: number }) => {
-    const { cx, cy, fill, index = 0 } = props;
-    if (cx === undefined || cy === undefined) return null;
-
-    return (
-      <motion.circle
-        cx={cx}
-        cy={cy}
-        r={4}
-        fill={fill}
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{
-          delay: 0.5 + index * 0.1,
-          type: "spring",
-          stiffness: 300,
-          damping: 15,
-        }}
-        style={{ filter: `drop-shadow(0 0 4px ${fill})` }}
-      />
-    );
-  };
 
   return (
     <motion.div
@@ -125,7 +142,7 @@ export function CourseTrends({ trends }: CourseTrendsProps) {
               axisLine={false}
               width={30}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip chartData={chartData} />} />
             <Area
               type="monotone"
               dataKey="quality"
