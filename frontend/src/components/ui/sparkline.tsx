@@ -25,6 +25,8 @@ export function Sparkline({
 }: SparklineProps) {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<SVGSVGElement>(null);
+  const id = useId();
+  const gradientId = `sparkline-gradient-${id}`;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -64,9 +66,6 @@ export function Sparkline({
     .join(" ");
 
   const areaPath = `${pathD} L ${points[points.length - 1].x} ${height - padding} L ${padding} ${height - padding} Z`;
-
-  const id = useId();
-  const gradientId = `sparkline-gradient-${id}`;
 
   return (
     <svg

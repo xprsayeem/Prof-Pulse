@@ -13,20 +13,6 @@ export interface Course {
   last_reviewed: string;
 }
 
-export interface BirdCourse {
-  bird_rank: number;
-  dept_bird_rank: number;
-  course_code: string;
-  department: string;
-  bird_score: number;
-  a_rate: number;
-  avg_difficulty: number;
-  would_take_again_pct: number;
-  avg_quality: number;
-  b_or_higher_rate: number;
-  total_reviews: number;
-}
-
 export interface CourseProfessor {
   course_code: string;
   professor_id: string;

@@ -40,16 +40,21 @@ export default async function ProfessorPage({ params }: ProfessorPageProps) {
     (sum, p) => sum + p.section_reviews,
     0
   );
+  // Guard against zero total reviews to avoid NaN from division.
   const avgQuality =
-    professorRecords.reduce(
-      (sum, p) => sum + (p.prof_avg_quality || 0) * p.section_reviews,
-      0
-    ) / totalReviews;
+    totalReviews > 0
+      ? professorRecords.reduce(
+          (sum, p) => sum + (p.prof_avg_quality || 0) * p.section_reviews,
+          0
+        ) / totalReviews
+      : 0;
   const avgDifficulty =
-    professorRecords.reduce(
-      (sum, p) => sum + (p.prof_avg_difficulty || 0) * p.section_reviews,
-      0
-    ) / totalReviews;
+    totalReviews > 0
+      ? professorRecords.reduce(
+          (sum, p) => sum + (p.prof_avg_difficulty || 0) * p.section_reviews,
+          0
+        ) / totalReviews
+      : 0;
 
   // Calculate weighted would take again
   const recordsWithWTA = professorRecords.filter(
