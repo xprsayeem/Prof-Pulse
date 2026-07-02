@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { BirdCourse } from "@/lib/types";
-import { getLiberalCategory, LiberalCategory } from "@/lib/liberals";
+import { getLiberalCategory } from "@/lib/liberals";
 import { BirdCourseCard } from "./BirdCourseCard";
 import { motion } from "framer-motion";
 import { Filter, SortAsc } from "lucide-react";
