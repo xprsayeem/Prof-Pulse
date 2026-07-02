@@ -54,8 +54,9 @@ Thumbs.db
 *.tsbuildinfo
 next-env.d.ts
 
-#databricks
-*.json
+# databricks data exports (large data artifacts)
+# NOTE: do NOT add a global `*.json` here — it silently excludes frontend
+# config (package.json, tsconfig.json, components.json) from the repo.
 *.parquet
 *.delta
 __pycache__/
