@@ -5,6 +5,8 @@ import { Search, BookOpen, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Course, CourseProfessor } from "@/lib/types";
+import { getSubjectName } from "@/lib/courses";
+import { getLiberalTitle } from "@/lib/liberals";
 
 interface SearchBarProps {
   courses: Course[];
@@ -66,16 +68,27 @@ export function SearchBar({ courses, professors }: SearchBarProps) {
     const q = query.toLowerCase();
     const results: Suggestion[] = [];
 
-    // Search courses
+    // Search courses by code, subject name, or (for liberals) course title.
+    // Most-reviewed matches first so popular courses surface at the top.
     const matchingCourses = courses
-      .filter((c) => c.course_code.toLowerCase().includes(q))
+      .filter((c) => {
+        const title = getLiberalTitle(c.course_code);
+        const subject = getSubjectName(c.course_code);
+        return `${c.course_code} ${subject} ${title ?? ""}`
+          .toLowerCase()
+          .includes(q);
+      })
+      .sort((a, b) => b.total_reviews - a.total_reviews)
       .slice(0, 5)
-      .map((c) => ({
-        type: "course" as const,
-        label: c.course_code,
-        sublabel: `${c.total_reviews} reviews - ${c.avg_quality?.toFixed(1) || "N/A"} quality`,
-        href: `/course/${c.course_code}`,
-      }));
+      .map((c) => {
+        const context = getLiberalTitle(c.course_code) ?? getSubjectName(c.course_code);
+        return {
+          type: "course" as const,
+          label: c.course_code,
+          sublabel: `${context} · ${c.total_reviews} reviews`,
+          href: `/course/${c.course_code}`,
+        };
+      });
 
     // Search professors
     const matchingProfs = uniqueProfessors
@@ -122,9 +135,17 @@ export function SearchBar({ courses, professors }: SearchBarProps) {
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setSelectedIndex((i) => (i - 1 + suggestions.length) % suggestions.length);
-    } else if (e.key === "Enter" && suggestions[selectedIndex]) {
-      router.push(suggestions[selectedIndex].href);
-      setIsOpen(false);
+    } else if (e.key === "Enter") {
+      if (suggestions[selectedIndex]) {
+        router.push(suggestions[selectedIndex].href);
+        setIsOpen(false);
+      } else if (/^[a-z]{2,4}\d{2,4}$/i.test(query.trim())) {
+        // Full course code typed with no dropdown match (e.g. a course that
+        // has no reviews yet) — go to the course page, which shows an
+        // informative not-found if it truly doesn't exist.
+        router.push(`/course/${query.trim().toUpperCase()}`);
+        setIsOpen(false);
+      }
     } else if (e.key === "Escape") {
       setIsOpen(false);
     }

@@ -438,7 +438,11 @@ export function getLiberalLabel(category: LiberalCategory): string {
   }
 }
 
+// O(1) title lookup by course code (search filters over all courses per keystroke)
+const TITLE_BY_CODE: Map<string, string> = new Map(
+  LIBERAL_COURSES.map((c) => [c.code, c.title])
+);
+
 export function getLiberalTitle(courseCode: string): string | null {
-  const course = LIBERAL_COURSES.find((c) => c.code === courseCode);
-  return course?.title || null;
+  return TITLE_BY_CODE.get(courseCode) ?? null;
 }
