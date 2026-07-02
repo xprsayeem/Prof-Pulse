@@ -1,5 +1,7 @@
 import { getBirdCourses } from "@/lib/api";
 import { BirdCoursesList } from "@/components/bird-courses/BirdCoursesList";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export const metadata = {
   title: "Bird Courses | ProfPulse",
@@ -23,6 +25,15 @@ export default async function BirdCoursesPage() {
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 py-12">
+        {/* Back button */}
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors mb-8"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to search</span>
+        </Link>
+
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">

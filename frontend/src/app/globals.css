@@ -131,7 +131,207 @@
   }
 }
 
-/* Glass effect utilities */
+/* ============================================
+   TYPOGRAPHY SYSTEM
+   ============================================ */
+
+.text-headline-1 {
+  @apply text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight;
+  line-height: 1.1;
+}
+
+.text-headline-2 {
+  @apply text-2xl md:text-3xl font-semibold tracking-tight;
+  line-height: 1.2;
+}
+
+.text-stat {
+  @apply text-3xl font-bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.text-label {
+  @apply text-xs uppercase tracking-widest font-medium;
+  letter-spacing: 0.1em;
+}
+
+/* ============================================
+   ANIMATION KEYFRAMES
+   ============================================ */
+
+@keyframes gradient-shift {
+  0%, 100% {
+    transform: translate(0%, 0%) rotate(0deg);
+  }
+  25% {
+    transform: translate(5%, 5%) rotate(1deg);
+  }
+  50% {
+    transform: translate(0%, 10%) rotate(0deg);
+  }
+  75% {
+    transform: translate(-5%, 5%) rotate(-1deg);
+  }
+}
+
+@keyframes breathe-glow {
+  0%, 100% {
+    opacity: 0.5;
+    filter: blur(40px);
+  }
+  50% {
+    opacity: 0.8;
+    filter: blur(50px);
+  }
+}
+
+@keyframes focus-ring-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 2px rgba(0, 76, 155, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(0, 76, 155, 0.2);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes scale-in {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up-fade {
+  0% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes draw-line {
+  0% {
+    stroke-dashoffset: 1000;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes rotate-in {
+  0% {
+    transform: rotate(-180deg) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   ANIMATION UTILITIES
+   ============================================ */
+
+.animate-gradient-shift {
+  animation: gradient-shift 20s ease-in-out infinite;
+}
+
+.animate-breathe-glow {
+  animation: breathe-glow 4s ease-in-out infinite;
+}
+
+.animate-focus-ring-pulse {
+  animation: focus-ring-pulse 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 6s ease-in-out infinite;
+  animation-delay: -3s;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 1s ease-in-out infinite;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.animate-slide-up-fade {
+  animation: slide-up-fade 0.4s ease-out forwards;
+}
+
+.animate-rotate-in {
+  animation: rotate-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* ============================================
+   GLASS EFFECT UTILITIES
+   ============================================ */
+
 .glass {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
@@ -141,15 +341,60 @@
 }
 
 .glass-hover {
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-hover:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px -10px rgba(0, 0, 0, 0.5);
 }
 
-/* Glow effects */
+/* ============================================
+   CARD HOVER EFFECTS
+   ============================================ */
+
+.card-hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 20px 40px -15px rgba(0, 0, 0, 0.5),
+    0 0 30px -10px rgba(0, 76, 155, 0.2);
+}
+
+.card-hover-glow {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.card-hover-glow::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, transparent, rgba(0, 76, 155, 0.3), transparent);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-hover-glow:hover::before {
+  opacity: 1;
+}
+
+/* ============================================
+   GLOW EFFECTS
+   ============================================ */
+
 .glow-blue {
   box-shadow: 0 0 40px rgba(0, 76, 155, 0.3);
 }
@@ -158,14 +403,146 @@
   box-shadow: 0 0 40px rgba(255, 220, 0, 0.2);
 }
 
-/* Focus states */
-input:focus, 
+.glow-text-blue {
+  text-shadow: 0 0 30px rgba(0, 76, 155, 0.5);
+}
+
+/* ============================================
+   BUTTON EFFECTS
+   ============================================ */
+
+.btn-interactive {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-interactive:hover {
+  transform: scale(1.02);
+}
+
+.btn-interactive:active {
+  transform: scale(0.98);
+}
+
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+  pointer-events: none;
+}
+
+/* ============================================
+   LINK EFFECTS
+   ============================================ */
+
+.link-underline {
+  position: relative;
+}
+
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  background: currentColor;
+  transition: width 0.3s ease;
+}
+
+.link-underline:hover::after {
+  width: 100%;
+}
+
+/* ============================================
+   INPUT EFFECTS
+   ============================================ */
+
+.input-glow:focus {
+  animation: focus-ring-pulse 2s ease-in-out infinite;
+}
+
+/* ============================================
+   FOCUS STATES
+   ============================================ */
+
+input:focus,
 button:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px rgba(0, 76, 155, 0.5);
 }
 
-/* Scrollbar styling */
+/* ============================================
+   BAR EFFECTS
+   ============================================ */
+
+.bar-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.bar-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.bar-shimmer:hover::after {
+  animation: shimmer 1.5s infinite;
+  opacity: 1;
+}
+
+/* ============================================
+   SKELETON LOADING
+   ============================================ */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.5rem;
+}
+
+/* ============================================
+   PROGRESS RING
+   ============================================ */
+
+.progress-ring-circle {
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -181,4 +558,35 @@ button:focus-visible {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================
+   ACCESSIBILITY - REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-gradient-shift,
+  .animate-breathe-glow,
+  .animate-focus-ring-pulse,
+  .animate-float,
+  .animate-float-delayed,
+  .animate-shimmer,
+  .animate-pulse-soft,
+  .animate-bounce-subtle {
+    animation: none !important;
+  }
+
+  .card-hover-lift:hover,
+  .glass-hover:hover {
+    transform: none !important;
+  }
 }

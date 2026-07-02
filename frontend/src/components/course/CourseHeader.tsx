@@ -2,8 +2,9 @@
 
 import { Course } from "@/lib/types";
 import { motion } from "framer-motion";
-import { ArrowLeft, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { ArrowLeft, TrendingUp, TrendingDown, Minus, GitCompare } from "lucide-react";
 import Link from "next/link";
+import { getLiberalCategory, getLiberalLabel } from "@/lib/liberals";
 
 interface CourseHeaderProps {
   course: Course;
@@ -20,6 +21,8 @@ export function CourseHeader({ course }: CourseHeaderProps) {
         return <Minus className="w-5 h-5 text-white/50" />;
     }
   };
+
+  const liberalCategory = getLiberalCategory(course.course_code);
 
   const getTrendLabel = () => {
     switch (course.trend) {
@@ -38,14 +41,24 @@ export function CourseHeader({ course }: CourseHeaderProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Back button */}
-      <Link
-        href="/"
-        className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors mb-6"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        <span>Back to search</span>
-      </Link>
+      {/* Navigation row */}
+      <div className="flex items-center justify-between mb-6">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to search</span>
+        </Link>
+
+        <Link
+          href={`/compare?mode=courses&items=${course.course_code}`}
+          className="inline-flex items-center gap-2 text-white/50 hover:text-brand-blue transition-colors"
+        >
+          <GitCompare className="w-4 h-4" />
+          <span>Compare</span>
+        </Link>
+      </div>
 
       {/* Course title */}
       <div className="glass p-8">
@@ -54,6 +67,17 @@ export function CourseHeader({ course }: CourseHeaderProps) {
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
               {course.course_code}
             </h1>
+            <div className="flex items-center gap-2 mt-2">
+              {liberalCategory && (
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                  liberalCategory === "lower"
+                    ? "bg-purple-400/20 text-purple-400"
+                    : "bg-cyan-400/20 text-cyan-400"
+                }`}>
+                  {getLiberalLabel(liberalCategory)}
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-3">
               <span className="text-white/50">
                 {course.total_reviews.toLocaleString()} reviews

@@ -2,7 +2,7 @@
 
 import { CourseProfessor } from "@/lib/types";
 import { motion } from "framer-motion";
-import { ArrowLeft, User } from "lucide-react";
+import { ArrowLeft, User, GitCompare } from "lucide-react";
 import Link from "next/link";
 
 interface ProfessorHeaderProps {
@@ -28,14 +28,24 @@ export function ProfessorHeader({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Back button */}
-      <Link
-        href="/"
-        className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors mb-6"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        <span>Back to search</span>
-      </Link>
+      {/* Navigation row */}
+      <div className="flex items-center justify-between mb-6">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to search</span>
+        </Link>
+
+        <Link
+          href={`/compare?mode=professors&items=${professor.professor_id}`}
+          className="inline-flex items-center gap-2 text-white/50 hover:text-brand-blue transition-colors"
+        >
+          <GitCompare className="w-4 h-4" />
+          <span>Compare</span>
+        </Link>
+      </div>
 
       {/* Professor header */}
       <div className="glass p-8">
