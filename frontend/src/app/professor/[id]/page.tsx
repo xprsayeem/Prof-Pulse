@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getCourseProfessors, getReviews } from "@/lib/api";
 import { notFound } from "next/navigation";
 import { ProfessorHeader } from "@/components/professor/ProfessorHeader";
@@ -7,6 +8,28 @@ import { ProfessorReviews } from "@/components/professor/ProfessorReviews";
 
 interface ProfessorPageProps {
   params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: ProfessorPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const professorId = decodeURIComponent(id);
+  // Only needs the professors export (deduped with the page fetch); does not
+  // touch the large reviews file.
+  const allProfessors = await getCourseProfessors();
+  const records = allProfessors.filter((p) => p.professor_id === professorId);
+
+  if (records.length === 0) {
+    return { title: "Professor Not Found | ProfPulse" };
+  }
+
+  const prof = records[0];
+
+  return {
+    title: `${prof.professor_name} — ${prof.department} | ProfPulse`,
+    description: `Reviews and ratings for ${prof.professor_name} (${prof.department}) at TMU across ${records.length} courses.`,
+  };
 }
 
 export default async function ProfessorPage({ params }: ProfessorPageProps) {

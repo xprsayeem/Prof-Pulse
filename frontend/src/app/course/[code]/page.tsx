@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { getCourses, getCourseProfessors, getCourseTrends } from "@/lib/api";
 import { notFound } from "next/navigation";
+import { getSubjectName } from "@/lib/courses";
+import { getLiberalTitle } from "@/lib/liberals";
 import { CourseHeader } from "@/components/course/CourseHeader";
 import { CourseStats } from "@/components/course/CourseStats";
 import { CourseProfessors } from "@/components/course/CourseProfessors";
@@ -7,6 +10,28 @@ import { CourseTrends } from "@/components/course/CourseTrends";
 
 interface CoursePageProps {
   params: Promise<{ code: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: CoursePageProps): Promise<Metadata> {
+  const { code } = await params;
+  const courseCode = decodeURIComponent(code).toUpperCase();
+  const courses = await getCourses();
+  const course = courses.find((c) => c.course_code === courseCode);
+
+  if (!course) {
+    return { title: "Course Not Found | ProfPulse" };
+  }
+
+  const subject = getSubjectName(courseCode);
+  const title = getLiberalTitle(courseCode);
+  const label = title ? `${courseCode} — ${title}` : `${courseCode} — ${subject}`;
+
+  return {
+    title: `${label} | ProfPulse`,
+    description: `${courseCode} (${subject}) at TMU: ${course.total_reviews} reviews, ${course.avg_quality?.toFixed(1)}/5 quality, ${course.avg_difficulty?.toFixed(1)}/5 difficulty.`,
+  };
 }
 
 export default async function CoursePage({ params }: CoursePageProps) {
