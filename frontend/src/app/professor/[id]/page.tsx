@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
-import { getCourseProfessors, getReviews } from "@/lib/api";
+import { getProfessorRecords, getReviewsForProfessor } from "@/lib/api";
 import { notFound } from "next/navigation";
 import { ProfessorHeader } from "@/components/professor/ProfessorHeader";
 import { ProfessorStats } from "@/components/professor/ProfessorStats";
 import { ProfessorCourses } from "@/components/professor/ProfessorCourses";
 import { ProfessorReviews } from "@/components/professor/ProfessorReviews";
+
+// Rendered on demand and cached; revalidated daily against the export.
+export const revalidate = 86400;
 
 interface ProfessorPageProps {
   params: Promise<{ id: string }>;
@@ -15,10 +18,8 @@ export async function generateMetadata({
 }: ProfessorPageProps): Promise<Metadata> {
   const { id } = await params;
   const professorId = decodeURIComponent(id);
-  // Only needs the professors export (deduped with the page fetch); does not
-  // touch the large reviews file.
-  const allProfessors = await getCourseProfessors();
-  const records = allProfessors.filter((p) => p.professor_id === professorId);
+  // Only the professor's own records (deduped with the page fetch).
+  const records = await getProfessorRecords(professorId);
 
   if (records.length === 0) {
     return { title: "Professor Not Found | ProfPulse" };
@@ -36,24 +37,14 @@ export default async function ProfessorPage({ params }: ProfessorPageProps) {
   const { id } = await params;
   const professorId = decodeURIComponent(id);
 
-  const [allProfessors, allReviews] = await Promise.all([
-    getCourseProfessors(),
-    getReviews(),
+  const [professorRecords, professorReviews] = await Promise.all([
+    getProfessorRecords(professorId),
+    getReviewsForProfessor(professorId),
   ]);
-
-  // Get all records for this professor (one per course they teach)
-  const professorRecords = allProfessors.filter(
-    (p) => p.professor_id === professorId
-  );
 
   if (professorRecords.length === 0) {
     notFound();
   }
-
-  // Filter reviews for this professor
-  const professorReviews = allReviews.filter(
-    (r) => r.professor_id === professorId
-  );
 
   // Use first record for basic info
   const professor = professorRecords[0];

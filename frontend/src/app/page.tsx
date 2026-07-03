@@ -1,20 +1,19 @@
-import { getCourses, getCourseProfessors, getDepartments } from "@/lib/api";
+import { getStats, getCoursesIndex, getProfessorsIndex } from "@/lib/api";
 import { SearchBar } from "@/components/home/SearchBar";
 import { LiveStats } from "@/components/home/LiveStats";
 import { QuickLinks } from "@/components/home/QuickLinks";
 
 export default async function Home() {
-  const [courses, professors, departments] = await Promise.all([
-    getCourses(),
-    getCourseProfessors(),
-    getDepartments(),
+  const [stats, courses, professors] = await Promise.all([
+    getStats(),
+    getCoursesIndex(),
+    getProfessorsIndex(),
   ]);
 
-  // Calculate stats
-  const totalReviews = courses.reduce((sum, c) => sum + c.total_reviews, 0);
-  const uniqueProfessors = new Set(professors.map((p) => p.professor_id)).size;
-  const totalCourses = courses.length;
-  const totalDepartments = departments.length;
+  const totalReviews = stats.total_reviews;
+  const uniqueProfessors = stats.total_professors;
+  const totalCourses = stats.total_courses;
+  const totalDepartments = stats.total_departments;
 
   return (
     <main className="min-h-screen">

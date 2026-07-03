@@ -91,3 +91,24 @@ export interface BirdCourse {
   top_professor_id: string | null;
   top_professor_quality: number | null;
 }
+
+// Lightweight shapes for the sharded export's index / summary files.
+export interface CourseIndex {
+  course_code: string;
+  total_reviews: number;
+  avg_quality: number;
+  avg_difficulty: number;
+}
+
+export interface ProfessorIndex {
+  professor_id: string;
+  professor_name: string;
+  department: string;
+}
+
+export interface SiteStats {
+  total_reviews: number;
+  total_professors: number;
+  total_courses: number;
+  total_departments: number;
+}

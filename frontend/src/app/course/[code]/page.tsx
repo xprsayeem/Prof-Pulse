@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getCourses, getCourseProfessors, getCourseTrends } from "@/lib/api";
+import { getCourse, getProfessorsForCourse, getTrendsForCourse } from "@/lib/api";
 import { notFound } from "next/navigation";
 import { getSubjectName } from "@/lib/courses";
 import { getLiberalTitle } from "@/lib/liberals";
@@ -7,6 +7,9 @@ import { CourseHeader } from "@/components/course/CourseHeader";
 import { CourseStats } from "@/components/course/CourseStats";
 import { CourseProfessors } from "@/components/course/CourseProfessors";
 import { CourseTrends } from "@/components/course/CourseTrends";
+
+// Rendered on demand and cached; revalidated daily against the export.
+export const revalidate = 86400;
 
 interface CoursePageProps {
   params: Promise<{ code: string }>;
@@ -17,8 +20,7 @@ export async function generateMetadata({
 }: CoursePageProps): Promise<Metadata> {
   const { code } = await params;
   const courseCode = decodeURIComponent(code).toUpperCase();
-  const courses = await getCourses();
-  const course = courses.find((c) => c.course_code === courseCode);
+  const course = await getCourse(courseCode);
 
   if (!course) {
     return { title: "Course Not Found | ProfPulse" };
@@ -38,20 +40,15 @@ export default async function CoursePage({ params }: CoursePageProps) {
   const { code } = await params;
   const courseCode = decodeURIComponent(code).toUpperCase();
 
-  const [courses, allProfessors, allTrends] = await Promise.all([
-    getCourses(),
-    getCourseProfessors(),
-    getCourseTrends(),
+  const [course, professors, trends] = await Promise.all([
+    getCourse(courseCode),
+    getProfessorsForCourse(courseCode),
+    getTrendsForCourse(courseCode),
   ]);
-
-  const course = courses.find((c) => c.course_code === courseCode);
 
   if (!course) {
     notFound();
   }
-
-  const professors = allProfessors.filter((p) => p.course_code === courseCode);
-  const trends = allTrends.filter((t) => t.course_code === courseCode);
 
   return (
     <main className="min-h-screen">

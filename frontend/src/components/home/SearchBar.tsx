@@ -4,13 +4,13 @@ import { useState, useMemo, useRef } from "react";
 import { Search, BookOpen, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { Course, CourseProfessor } from "@/lib/types";
+import { CourseIndex, ProfessorIndex } from "@/lib/types";
 import { getSubjectName } from "@/lib/courses";
 import { getLiberalTitle } from "@/lib/liberals";
 
 interface SearchBarProps {
-  courses: Course[];
-  professors: CourseProfessor[];
+  courses: CourseIndex[];
+  professors: ProfessorIndex[];
 }
 
 interface Suggestion {
