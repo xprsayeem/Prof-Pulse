@@ -23,11 +23,11 @@ interface Suggestion {
 function TypingIndicator() {
   return (
     <div className="flex items-center gap-1 px-4 py-3">
-      <span className="text-white/40 text-sm mr-2">Searching</span>
+      <span className="text-muted-foreground text-sm mr-2">Searching</span>
       {[0, 1, 2].map((i) => (
         <motion.div
           key={i}
-          className="w-1.5 h-1.5 bg-brand-blue rounded-full"
+          className="w-1.5 h-1.5 bg-primary rounded-full"
           animate={{
             y: [0, -4, 0],
           }}
@@ -168,32 +168,30 @@ export function SearchBar({ courses, professors }: SearchBarProps) {
   return (
     <div className="relative w-full max-w-2xl mx-auto">
       {/* Search Input */}
-      <div className="glass glow-blue p-1">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            onFocus={() => setIsOpen(true)}
-            onBlur={() => setTimeout(() => setIsOpen(false), 200)}
-            placeholder="Search courses or professors..."
-            className="w-full bg-white/5 text-white placeholder:text-white/40 pl-12 pr-4 py-4 rounded-xl border border-white/10 focus:border-brand-blue/50 focus:bg-white/10 transition-all duration-300 text-lg input-glow"
-          />
-        </div>
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+        <input
+          ref={inputRef}
+          type="text"
+          value={query}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          onFocus={() => setIsOpen(true)}
+          onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+          placeholder="Search courses or professors..."
+          className="w-full bg-card text-foreground placeholder:text-muted-foreground pl-12 pr-4 py-3.5 rounded-xl border border-border shadow-sm focus:border-primary focus:outline-none transition-colors text-base"
+        />
       </div>
 
       {/* Search hints */}
       <div className="relative z-0 mt-4 flex flex-wrap justify-center gap-2">
-        <span className="text-white/30 text-sm">Try:</span>
+        <span className="text-muted-foreground text-sm">Try:</span>
         {hints.map((hint) => (
           <button
             key={hint}
             type="button"
             onClick={() => handleHintClick(hint)}
-            className="text-sm text-white/50 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1 rounded-full transition-all duration-300 btn-interactive"
+            className="text-sm text-muted-foreground hover:text-foreground bg-secondary hover:bg-accent px-3 py-1 rounded-full transition-colors"
           >
             {hint}
           </button>
@@ -204,71 +202,57 @@ export function SearchBar({ courses, professors }: SearchBarProps) {
       <AnimatePresence>
         {showDropdown && (
           <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.98 }}
-            transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-            className="absolute top-full left-0 right-0 mt-2 bg-neutral-900 border border-white/10 rounded-2xl overflow-hidden z-50"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
+            className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-xl overflow-hidden shadow-md z-50"
           >
             {isTyping && suggestions.length === 0 ? (
               <TypingIndicator />
             ) : (
               suggestions.map((suggestion, index) => (
-                <motion.button
+                <button
                   key={`${suggestion.type}-${suggestion.label}`}
                   onClick={() => {
                     router.push(suggestion.href);
                     setIsOpen(false);
                   }}
-                  className={`w-full flex items-center gap-4 px-4 py-3 text-left transition-all duration-200 group relative ${
-                    index === selectedIndex
-                      ? "bg-brand-blue/20"
-                      : "hover:bg-white/5"
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors relative ${
+                    index === selectedIndex ? "bg-accent" : "hover:bg-accent/60"
                   }`}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.03 }}
                 >
-                  {/* Left accent border on hover */}
-                  <motion.div
-                    className={`absolute left-0 top-0 bottom-0 w-0.5 bg-brand-blue ${
-                      index === selectedIndex ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                    }`}
-                    initial={{ scaleY: 0 }}
-                    animate={{ scaleY: index === selectedIndex ? 1 : 0 }}
-                    whileHover={{ scaleY: 1 }}
-                    transition={{ duration: 0.2 }}
-                  />
+                  {index === selectedIndex && (
+                    <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary" />
+                  )}
 
-                  <motion.div
+                  <div
                     className={`p-2 rounded-lg ${
                       suggestion.type === "course"
-                        ? "bg-brand-blue/20 text-brand-blue"
-                        : "bg-brand-gold/20 text-brand-gold"
+                        ? "bg-primary/10 text-primary"
+                        : "bg-muted text-muted-foreground"
                     }`}
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   >
                     {suggestion.type === "course" ? (
                       <BookOpen className="w-4 h-4" />
                     ) : (
                       <User className="w-4 h-4" />
                     )}
-                  </motion.div>
+                  </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-white font-medium truncate group-hover:translate-x-1 transition-transform duration-200">
+                    <p className="text-foreground font-medium truncate">
                       {suggestion.label}
                     </p>
-                    <p className="text-white/50 text-sm truncate">
+                    <p className="text-muted-foreground text-sm truncate">
                       {suggestion.sublabel}
                     </p>
                   </div>
 
-                  <span className="text-white/30 text-xs uppercase tracking-wider">
+                  <span className="text-muted-foreground text-xs uppercase tracking-wider">
                     {suggestion.type}
                   </span>
-                </motion.button>
+                </button>
               ))
             )}
           </motion.div>
