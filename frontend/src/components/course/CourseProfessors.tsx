@@ -28,29 +28,29 @@ export function CourseProfessors({ professors }: CourseProfessorsProps) {
         return (
           <motion.div
             key={prof.professor_id}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 * index, duration: 0.5 }}
+            transition={{ delay: Math.min(index * 0.04, 0.3), duration: 0.4 }}
           >
             <Link href={`/professor/${prof.professor_id}`}>
-              <div className="glass glass-hover p-5 h-full">
+              <div className="h-full rounded-xl border border-border bg-card p-5 shadow-soft transition-all hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-soft-md">
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <h3 className="text-lg font-semibold text-white">
+                    <h3 className="text-lg font-medium text-foreground">
                       {prof.professor_name}
                     </h3>
-                    <p className="text-white/50 text-sm">{prof.department}</p>
+                    <p className="text-muted-foreground text-sm">{prof.department}</p>
                   </div>
 
                   <div className="flex gap-2">
                     {isTopPick && (
-                      <div className="flex items-center gap-1 bg-brand-gold/20 text-brand-gold px-2 py-1 rounded-full text-xs font-medium">
+                      <div className="flex items-center gap-1 rounded-full bg-brand/15 px-2 py-1 text-xs font-medium text-brand">
                         <Star className="w-3 h-3" />
-                        Top Pick
+                        Top pick
                       </div>
                     )}
                     {isActive && (
-                      <div className="flex items-center gap-1 bg-emerald-400/20 text-emerald-400 px-2 py-1 rounded-full text-xs font-medium">
+                      <div className="rounded-full border border-border px-2 py-1 text-xs font-medium text-muted-foreground">
                         Active
                       </div>
                     )}
@@ -59,36 +59,34 @@ export function CourseProfessors({ professors }: CourseProfessorsProps) {
 
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <p className="text-2xl font-bold text-brand-blue">
+                    <p className="font-display text-2xl font-medium text-brand">
                       {prof.prof_avg_quality?.toFixed(1) || "N/A"}
                     </p>
-                    <p className="text-white/40 text-xs">Quality</p>
+                    <p className="text-muted-foreground text-xs">Quality</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-brand-gold">
+                    <p className="font-display text-2xl font-medium text-foreground">
                       {prof.prof_avg_difficulty?.toFixed(1) || "N/A"}
                     </p>
-                    <p className="text-white/40 text-xs">Difficulty</p>
+                    <p className="text-muted-foreground text-xs">Difficulty</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">
+                    <p className="font-display text-2xl font-medium text-foreground">
                       {prof.prof_would_take_again_pct
                         ? `${prof.prof_would_take_again_pct.toFixed(0)}%`
                         : "N/A"}
                     </p>
-                    <p className="text-white/40 text-xs">Would Retake</p>
+                    <p className="text-muted-foreground text-xs">Would retake</p>
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-1 text-white/40">
+                <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
                     <Users className="w-4 h-4" />
                     <span>{prof.section_reviews} reviews</span>
                   </div>
                   {prof.most_recent_year && (
-                    <div className={`flex items-center gap-1 ${
-                      isActive ? "text-emerald-400" : "text-white/40"
-                    }`}>
+                    <div className={`flex items-center gap-1 ${isActive ? "text-brand" : ""}`}>
                       <TrendingUp className="w-4 h-4" />
                       <span>Last taught {prof.most_recent_year}</span>
                     </div>
@@ -126,7 +124,7 @@ function calculateProfessorScore(prof: CourseProfessor, currentYear: number): nu
   const sampleScore = Math.min(100, 20 + Math.log10(reviewCount + 1) * 40);
 
   // Weighted combination
-  const finalScore = 
+  const finalScore =
     recencyScore * 0.40 +
     qualityScore * 0.35 +
     sampleScore * 0.25;

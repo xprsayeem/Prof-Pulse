@@ -3,7 +3,6 @@
 import { Course } from "@/lib/types";
 import { motion } from "framer-motion";
 import { ThumbsUp, Award, Calendar, BarChart3 } from "lucide-react";
-import { ProgressRing } from "@/components/ui/progress-ring";
 import { useState } from "react";
 
 interface CourseStatsProps {
@@ -80,50 +79,38 @@ export function CourseStats({ course }: CourseStatsProps) {
 
   const stats = [
     {
-      label: "Would Take Again",
-      value: course.would_take_again_pct,
+      label: "Would take again",
       displayValue: course.would_take_again_pct
         ? `${course.would_take_again_pct.toFixed(0)}%`
         : "N/A",
-      showRing: !!course.would_take_again_pct,
       icon: ThumbsUp,
-      color: "#34d399",
-      bgColor: "bg-emerald-400/10",
+      accent: true,
     },
     {
-      label: "Recent Quality",
-      value: course.recent_avg_quality ? (course.recent_avg_quality / 5) * 100 : null,
+      label: "Recent quality",
       displayValue: course.recent_avg_quality?.toFixed(1) || "N/A",
-      subtext: course.recent_reviews ? `${course.recent_reviews} reviews from the past 2 years` : undefined,
-      showRing: !!course.recent_avg_quality,
+      subtext: course.recent_reviews ? `${course.recent_reviews} reviews, past 2 years` : undefined,
       icon: Award,
-      color: "#004C9B",
-      bgColor: "bg-brand-blue/10",
+      accent: false,
     },
     {
-      label: "First Reviewed",
-      value: null,
+      label: "First reviewed",
       displayValue: course.first_reviewed
         ? new Date(course.first_reviewed).getFullYear().toString()
         : "N/A",
-      showRing: false,
       icon: Calendar,
-      color: "#a78bfa",
-      bgColor: "bg-purple-400/10",
+      accent: false,
     },
     {
-      label: "Last Reviewed",
-      value: null,
+      label: "Last reviewed",
       displayValue: course.last_reviewed
         ? new Date(course.last_reviewed).toLocaleDateString("en-US", {
             month: "short",
             year: "numeric",
           })
         : "N/A",
-      showRing: false,
       icon: Calendar,
-      color: "#FFDC00",
-      bgColor: "bg-brand-gold/10",
+      accent: false,
     },
   ];
 
@@ -134,42 +121,23 @@ export function CourseStats({ course }: CourseStatsProps) {
         {stats.map((stat, index) => (
           <motion.div
             key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 * index, duration: 0.5 }}
-            whileHover={{ y: -2 }}
-            className="glass p-4 relative overflow-hidden group"
+            transition={{ delay: 0.06 * index, duration: 0.4 }}
+            className="rounded-xl border border-border bg-card p-4 shadow-soft"
           >
-            {/* Hover gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-            <div className="relative z-10">
-              {stat.showRing && stat.value !== null ? (
-                <div className="flex justify-center mb-2">
-                  <ProgressRing
-                    value={stat.value}
-                    max={100}
-                    size={60}
-                    strokeWidth={4}
-                    color={stat.color}
-                    showValue={false}
-                  />
-                </div>
-              ) : (
-                <motion.div
-                  className={`inline-flex p-2 rounded-lg ${stat.bgColor} mb-2`}
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                >
-                  <stat.icon className="w-4 h-4" style={{ color: stat.color }} />
-                </motion.div>
-              )}
-              <p className="text-xl font-bold text-white">{stat.displayValue}</p>
-              <p className="text-white/50 text-sm">{stat.label}</p>
-              {stat.subtext && (
-                <p className="text-white/30 text-xs mt-1">{stat.subtext}</p>
-              )}
-            </div>
+            <stat.icon className="mb-2 h-4 w-4 text-muted-foreground" />
+            <p
+              className={`font-display text-2xl font-medium ${
+                stat.accent ? "text-brand" : "text-foreground"
+              }`}
+            >
+              {stat.displayValue}
+            </p>
+            <p className="text-muted-foreground text-sm">{stat.label}</p>
+            {stat.subtext && (
+              <p className="text-muted-foreground/80 text-xs mt-1">{stat.subtext}</p>
+            )}
           </motion.div>
         ))}
       </div>
@@ -177,15 +145,15 @@ export function CourseStats({ course }: CourseStatsProps) {
       {/* Grade distribution */}
       {gradeData.length > 0 && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-          className="glass p-6"
+          transition={{ delay: 0.3, duration: 0.4 }}
+          className="rounded-xl border border-border bg-card p-6 shadow-soft"
         >
           <div className="flex items-center gap-2 mb-4">
-            <BarChart3 className="w-5 h-5 text-brand-blue" />
-            <h3 className="text-lg font-semibold text-white">Grade Distribution</h3>
-            <span className="text-white/30 text-sm">({totalGrades} reported)</span>
+            <BarChart3 className="w-5 h-5 text-brand" />
+            <h3 className="font-display text-lg text-foreground">Grade distribution</h3>
+            <span className="text-muted-foreground text-sm">({totalGrades} reported)</span>
           </div>
 
           <div className="space-y-2">
@@ -213,47 +181,37 @@ export function CourseStats({ course }: CourseStatsProps) {
               })();
 
               return (
-                <motion.div
+                <div
                   key={g.grade}
-                  className="flex items-center gap-3 group cursor-default"
+                  className="flex items-center gap-3 cursor-default"
                   onMouseEnter={() => setHoveredGrade(g.grade)}
                   onMouseLeave={() => setHoveredGrade(null)}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + index * 0.05 }}
                 >
                   <span
-                    className="w-10 text-white/70 text-sm font-medium shrink-0"
+                    className="w-10 text-foreground/80 text-sm font-medium shrink-0"
                     title={g.grade}
                   >
                     {displayLabel}
                   </span>
-                  <div className="flex-1 h-6 bg-white/5 rounded-full overflow-hidden relative bar-shimmer">
+                  <div className="relative flex-1 h-6 bg-secondary rounded-md overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${percentage}%` }}
-                      transition={{ delay: 0.6 + index * 0.05, duration: 0.8, ease: "easeOut" }}
-                      className={`h-full rounded-full transition-colors duration-200 ${
-                        isHighGrade
-                          ? "bg-gradient-to-r from-brand-blue to-brand-blue/80"
-                          : "bg-white/20"
-                      } ${isHovered ? "brightness-125" : ""}`}
+                      transition={{ delay: 0.15 + index * 0.04, duration: 0.7, ease: "easeOut" }}
+                      className={`h-full rounded-md transition-colors ${
+                        isHighGrade ? "bg-brand" : "bg-muted-foreground/45"
+                      } ${isHovered ? "brightness-110" : ""}`}
                     />
-                    {/* Tooltip on hover */}
                     {isHovered && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/90 border border-white/20 px-2 py-1 rounded text-xs text-white whitespace-nowrap z-10"
-                      >
+                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-foreground text-background px-2 py-1 rounded text-xs whitespace-nowrap z-10">
                         {g.count} students
-                      </motion.div>
+                      </div>
                     )}
                   </div>
-                  <span className="w-12 text-right text-white/50 text-sm shrink-0 tabular-nums">
+                  <span className="w-12 text-right text-muted-foreground text-sm shrink-0 tabular-nums">
                     {percentage.toFixed(0)}%
                   </span>
-                </motion.div>
+                </div>
               );
             })}
           </div>

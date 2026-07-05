@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, TrendingUp, TrendingDown, Minus, GitCompare } from "lucide-react";
 import Link from "next/link";
 import { getLiberalCategory, getLiberalLabel } from "@/lib/liberals";
+import { getSubjectName } from "@/lib/courses";
 
 interface CourseHeaderProps {
   course: Course;
@@ -14,11 +15,11 @@ export function CourseHeader({ course }: CourseHeaderProps) {
   const getTrendIcon = () => {
     switch (course.trend) {
       case "improving":
-        return <TrendingUp className="w-5 h-5 text-emerald-400" />;
+        return <TrendingUp className="w-5 h-5 text-brand" />;
       case "declining":
-        return <TrendingDown className="w-5 h-5 text-red-400" />;
+        return <TrendingDown className="w-5 h-5 text-destructive" />;
       default:
-        return <Minus className="w-5 h-5 text-white/50" />;
+        return <Minus className="w-5 h-5 text-muted-foreground" />;
     }
   };
 
@@ -37,15 +38,15 @@ export function CourseHeader({ course }: CourseHeaderProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.4 }}
     >
       {/* Navigation row */}
       <div className="flex items-center justify-between mb-6">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to search</span>
@@ -53,7 +54,7 @@ export function CourseHeader({ course }: CourseHeaderProps) {
 
         <Link
           href={`/compare?mode=courses&items=${course.course_code}`}
-          className="inline-flex items-center gap-2 text-white/50 hover:text-brand-blue transition-colors"
+          className="inline-flex items-center gap-2 text-muted-foreground hover:text-brand transition-colors"
         >
           <GitCompare className="w-4 h-4" />
           <span>Compare</span>
@@ -61,53 +62,48 @@ export function CourseHeader({ course }: CourseHeaderProps) {
       </div>
 
       {/* Course title */}
-      <div className="glass p-8">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="rounded-2xl border border-border bg-card p-8 shadow-soft">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-              {course.course_code}
-            </h1>
-            <div className="flex items-center gap-2 mt-2">
+            <div className="flex items-center gap-3">
+              <h1 className="font-display text-4xl tracking-tight text-foreground">
+                {course.course_code}
+              </h1>
               {liberalCategory && (
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  liberalCategory === "lower"
-                    ? "bg-purple-400/20 text-purple-400"
-                    : "bg-cyan-400/20 text-cyan-400"
-                }`}>
+                <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
                   {getLiberalLabel(liberalCategory)}
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-white/50">
-                {course.total_reviews.toLocaleString()} reviews
-              </span>
-              <span className="text-white/30">•</span>
-              <span className="text-white/50">
+            <p className="mt-1 text-muted-foreground">{getSubjectName(course.course_code)}</p>
+            <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+              <span>{course.total_reviews.toLocaleString()} reviews</span>
+              <span className="text-border">•</span>
+              <span>
                 {course.total_professors} professor{course.total_professors !== 1 ? "s" : ""}
               </span>
             </div>
           </div>
 
-          {/* Quality badge */}
-          <div className="flex items-center gap-4">
+          {/* Quality / difficulty / trend */}
+          <div className="flex items-center gap-5">
             <div className="text-center">
-              <div className="text-3xl font-bold text-brand-blue">
+              <div className="font-display text-3xl font-medium text-brand">
                 {course.avg_quality?.toFixed(1) || "N/A"}
               </div>
-              <div className="text-white/50 text-sm">Quality</div>
+              <div className="text-muted-foreground text-sm">Quality</div>
             </div>
-            <div className="h-12 w-px bg-white/10" />
+            <div className="h-12 w-px bg-border" />
             <div className="text-center">
-              <div className="text-3xl font-bold text-brand-gold">
+              <div className="font-display text-3xl font-medium text-foreground">
                 {course.avg_difficulty?.toFixed(1) || "N/A"}
               </div>
-              <div className="text-white/50 text-sm">Difficulty</div>
+              <div className="text-muted-foreground text-sm">Difficulty</div>
             </div>
-            <div className="h-12 w-px bg-white/10" />
-            <div className="flex flex-col items-center">
+            <div className="h-12 w-px bg-border" />
+            <div className="flex flex-col items-center gap-1">
               {getTrendIcon()}
-              <div className="text-white/50 text-sm">{getTrendLabel()}</div>
+              <div className="text-muted-foreground text-sm">{getTrendLabel()}</div>
             </div>
           </div>
         </div>

@@ -16,6 +16,10 @@ interface CourseTrendsProps {
   trends: CourseTrend[];
 }
 
+// Palette (recharts needs literal colors, not CSS vars)
+const QUALITY = "#A9762A"; // ochre
+const DIFFICULTY = "#4B4641"; // warm charcoal
+
 type ChartPoint = {
   year: number;
   quality: number;
@@ -23,8 +27,7 @@ type ChartPoint = {
   reviews: number;
 };
 
-// Custom tooltip component. Defined at module scope (not inside the parent
-// render) so it keeps a stable identity across renders. Recharts injects
+// Module-scoped so it keeps a stable identity across renders. Recharts injects
 // active/payload/label; chartData is passed in explicitly.
 function CustomTooltip({
   active,
@@ -39,28 +42,23 @@ function CustomTooltip({
 }) {
   if (active && payload && payload.length) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 5 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-black/95 border border-white/20 rounded-lg p-3 backdrop-blur-xl"
-      >
-        <p className="text-white font-medium mb-2">{label}</p>
+      <div className="rounded-lg border border-border bg-card p-3 shadow-soft-md">
+        <p className="text-foreground font-medium mb-2">{label}</p>
         {payload.map((entry, index) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
             {entry.dataKey === "quality" ? "Quality" : "Difficulty"}:{" "}
             <span className="font-medium">{entry.value?.toFixed(2)}</span>
           </p>
         ))}
-        <p className="text-white/40 text-xs mt-2">
+        <p className="text-muted-foreground text-xs mt-2">
           {chartData.find((d) => d.year === label)?.reviews} reviews
         </p>
-      </motion.div>
+      </div>
     );
   }
   return null;
 }
 
-// Custom animated dot. Also module-scoped for a stable component identity.
 function AnimatedDot(props: { cx?: number; cy?: number; fill?: string; index?: number }) {
   const { cx, cy, fill, index = 0 } = props;
   if (cx === undefined || cy === undefined) return null;
@@ -69,17 +67,16 @@ function AnimatedDot(props: { cx?: number; cy?: number; fill?: string; index?: n
     <motion.circle
       cx={cx}
       cy={cy}
-      r={4}
+      r={3.5}
       fill={fill}
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{
-        delay: 0.5 + index * 0.1,
+        delay: 0.4 + index * 0.08,
         type: "spring",
         stiffness: 300,
         damping: 15,
       }}
-      style={{ filter: `drop-shadow(0 0 4px ${fill})` }}
     />
   );
 }
@@ -104,40 +101,40 @@ export function CourseTrends({ trends }: CourseTrendsProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.3, duration: 0.5 }}
-      className="glass p-6"
+      transition={{ delay: 0.2, duration: 0.4 }}
+      className="rounded-xl border border-border bg-card p-6 shadow-soft"
     >
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData}>
             <defs>
               <linearGradient id="qualityGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#004C9B" stopOpacity={0.3} />
-                <stop offset="100%" stopColor="#004C9B" stopOpacity={0} />
+                <stop offset="0%" stopColor={QUALITY} stopOpacity={0.22} />
+                <stop offset="100%" stopColor={QUALITY} stopOpacity={0} />
               </linearGradient>
               <linearGradient id="difficultyGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#FFDC00" stopOpacity={0.2} />
-                <stop offset="100%" stopColor="#FFDC00" stopOpacity={0} />
+                <stop offset="0%" stopColor={DIFFICULTY} stopOpacity={0.14} />
+                <stop offset="100%" stopColor={DIFFICULTY} stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="rgba(255,255,255,0.05)"
+              stroke="rgba(51,48,43,0.08)"
               vertical={false}
             />
             <XAxis
               dataKey="year"
-              stroke="rgba(255,255,255,0.3)"
-              tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 12 }}
+              stroke="#DAD3BD"
+              tick={{ fill: "#6F6959", fontSize: 12 }}
               tickLine={false}
-              axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
+              axisLine={{ stroke: "#DAD3BD" }}
             />
             <YAxis
               domain={[0, 5]}
-              stroke="rgba(255,255,255,0.3)"
-              tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 12 }}
+              stroke="#DAD3BD"
+              tick={{ fill: "#6F6959", fontSize: 12 }}
               tickLine={false}
               axisLine={false}
               width={30}
@@ -146,30 +143,20 @@ export function CourseTrends({ trends }: CourseTrendsProps) {
             <Area
               type="monotone"
               dataKey="quality"
-              stroke="#004C9B"
+              stroke={QUALITY}
               strokeWidth={2}
               fill="url(#qualityGradient)"
-              dot={(props) => <AnimatedDot {...props} fill="#004C9B" />}
-              activeDot={{
-                r: 6,
-                fill: "#004C9B",
-                stroke: "rgba(0, 76, 155, 0.3)",
-                strokeWidth: 8,
-              }}
+              dot={(props) => <AnimatedDot {...props} fill={QUALITY} />}
+              activeDot={{ r: 5, fill: QUALITY }}
             />
             <Area
               type="monotone"
               dataKey="difficulty"
-              stroke="#FFDC00"
+              stroke={DIFFICULTY}
               strokeWidth={2}
               fill="url(#difficultyGradient)"
-              dot={(props) => <AnimatedDot {...props} fill="#FFDC00" />}
-              activeDot={{
-                r: 6,
-                fill: "#FFDC00",
-                stroke: "rgba(255, 220, 0, 0.3)",
-                strokeWidth: 8,
-              }}
+              dot={(props) => <AnimatedDot {...props} fill={DIFFICULTY} />}
+              activeDot={{ r: 5, fill: DIFFICULTY }}
             />
           </AreaChart>
         </ResponsiveContainer>
@@ -177,20 +164,14 @@ export function CourseTrends({ trends }: CourseTrendsProps) {
 
       {/* Legend */}
       <div className="flex justify-center gap-6 mt-4">
-        <motion.div
-          className="flex items-center gap-2"
-          whileHover={{ scale: 1.05 }}
-        >
-          <div className="w-3 h-3 rounded-full bg-brand-blue" style={{ boxShadow: "0 0 8px rgba(0, 76, 155, 0.5)" }} />
-          <span className="text-white/50 text-sm">Quality</span>
-        </motion.div>
-        <motion.div
-          className="flex items-center gap-2"
-          whileHover={{ scale: 1.05 }}
-        >
-          <div className="w-3 h-3 rounded-full bg-brand-gold" style={{ boxShadow: "0 0 8px rgba(255, 220, 0, 0.5)" }} />
-          <span className="text-white/50 text-sm">Difficulty</span>
-        </motion.div>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full" style={{ background: QUALITY }} />
+          <span className="text-muted-foreground text-sm">Quality</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full" style={{ background: DIFFICULTY }} />
+          <span className="text-muted-foreground text-sm">Difficulty</span>
+        </div>
       </div>
 
       {/* Yearly breakdown */}
@@ -200,13 +181,12 @@ export function CourseTrends({ trends }: CourseTrendsProps) {
             key={d.year}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 + index * 0.1 }}
-            whileHover={{ y: -2, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
-            className="bg-white/5 rounded-lg p-3 text-center transition-colors"
+            transition={{ delay: 0.3 + index * 0.06 }}
+            className="rounded-lg bg-secondary p-3 text-center"
           >
-            <p className="text-white/40 text-xs">{d.year}</p>
-            <p className="text-white font-semibold">{d.quality?.toFixed(1)}</p>
-            <p className="text-white/30 text-xs">{d.reviews} reviews</p>
+            <p className="text-muted-foreground text-xs">{d.year}</p>
+            <p className="font-display text-foreground font-medium">{d.quality?.toFixed(1)}</p>
+            <p className="text-muted-foreground text-xs">{d.reviews} reviews</p>
           </motion.div>
         ))}
       </div>

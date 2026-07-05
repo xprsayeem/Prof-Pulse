@@ -51,38 +51,30 @@ export default async function CoursePage({ params }: CoursePageProps) {
   }
 
   return (
-    <main className="min-h-screen">
-      {/* Background gradient */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-brand-blue/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-gold/5 rounded-full blur-3xl" />
+    <main className="mx-auto max-w-5xl px-4 py-12">
+      <CourseHeader course={course} />
+
+      <div className="mt-8">
+        <CourseStats course={course} />
       </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 py-12">
-        <CourseHeader course={course} />
-        
-        <div className="mt-8">
-          <CourseStats course={course} />
+      {professors.length > 0 && (
+        <div className="mt-12">
+          <h2 className="font-display text-2xl text-foreground mb-4">
+            Professors teaching this course
+          </h2>
+          <CourseProfessors professors={professors} />
         </div>
+      )}
 
-        {professors.length > 0 && (
-          <div className="mt-12">
-            <h2 className="text-xl font-semibold text-white mb-4">
-              Professors Teaching This Course
-            </h2>
-            <CourseProfessors professors={professors} />
-          </div>
-        )}
-
-        {trends.length > 1 && (
-          <div className="mt-12">
-            <h2 className="text-xl font-semibold text-white mb-4">
-              Course Trends Over Time
-            </h2>
-            <CourseTrends trends={trends} />
-          </div>
-        )}
-      </div>
+      {trends.length > 1 && (
+        <div className="mt-12">
+          <h2 className="font-display text-2xl text-foreground mb-4">
+            Course trends over time
+          </h2>
+          <CourseTrends trends={trends} />
+        </div>
+      )}
     </main>
   );
 }
