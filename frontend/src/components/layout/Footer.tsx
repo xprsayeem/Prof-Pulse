@@ -7,7 +7,7 @@ export function Footer() {
           Built by{" "}
           <a
             href="https://github.com/xprsayeem"
-            className="text-primary hover:underline"
+            className="text-brand hover:underline"
           >
             Sayeem Mahfuz
           </a>

@@ -13,15 +13,26 @@ export default async function Home() {
   return (
     <main>
       {/* Hero */}
-      <section className="mx-auto max-w-3xl px-4 pt-20 pb-14 text-center">
-        <h1 className="font-display text-5xl tracking-tight md:text-6xl">
-          Find the courses worth taking.
-        </h1>
-        <p className="mx-auto mt-4 mb-8 max-w-xl text-lg text-muted-foreground">
-          Search {stats.total_reviews.toLocaleString()} student reviews across
-          every TMU course and professor.
-        </p>
-        <SearchBar courses={courses} professors={professors} />
+      <section className="relative px-4 pt-20 pb-14">
+        {/* Soft warm glow behind the headline */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 mx-auto h-80 max-w-3xl"
+          style={{
+            background:
+              "radial-gradient(60% 100% at 50% 0%, oklch(0.72 0.1 68 / 0.22), transparent 72%)",
+          }}
+        />
+        <div className="mx-auto max-w-3xl text-center">
+          <h1 className="font-display text-5xl tracking-tight md:text-6xl">
+            Find the courses worth taking.
+          </h1>
+          <p className="mx-auto mt-4 mb-8 max-w-xl text-lg text-muted-foreground">
+            Search {stats.total_reviews.toLocaleString()} student reviews across
+            every TMU course and professor.
+          </p>
+          <SearchBar courses={courses} professors={professors} />
+        </div>
       </section>
 
       {/* Stats */}

@@ -12,7 +12,7 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 font-medium">
-          <Activity className="h-5 w-5 text-primary" />
+          <Activity className="h-5 w-5 text-brand" />
           <span>ProfPulse</span>
         </Link>
         <nav className="flex items-center gap-1 text-sm">

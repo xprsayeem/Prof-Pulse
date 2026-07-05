@@ -27,7 +27,7 @@ function TypingIndicator() {
       {[0, 1, 2].map((i) => (
         <motion.div
           key={i}
-          className="w-1.5 h-1.5 bg-primary rounded-full"
+          className="w-1.5 h-1.5 bg-brand rounded-full"
           animate={{
             y: [0, -4, 0],
           }}
@@ -179,7 +179,7 @@ export function SearchBar({ courses, professors }: SearchBarProps) {
           onFocus={() => setIsOpen(true)}
           onBlur={() => setTimeout(() => setIsOpen(false), 200)}
           placeholder="Search courses or professors..."
-          className="w-full bg-card text-foreground placeholder:text-muted-foreground pl-12 pr-4 py-3.5 rounded-xl border border-border shadow-sm focus:border-primary focus:outline-none transition-colors text-base"
+          className="w-full bg-card text-foreground placeholder:text-muted-foreground pl-12 pr-4 py-3.5 rounded-xl border border-border shadow-soft focus:border-brand focus:outline-none transition-colors text-base"
         />
       </div>
 
@@ -223,13 +223,13 @@ export function SearchBar({ courses, professors }: SearchBarProps) {
                   }`}
                 >
                   {index === selectedIndex && (
-                    <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary" />
+                    <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-brand" />
                   )}
 
                   <div
                     className={`p-2 rounded-lg ${
                       suggestion.type === "course"
-                        ? "bg-primary/10 text-primary"
+                        ? "bg-brand/10 text-brand"
                         : "bg-muted text-muted-foreground"
                     }`}
                   >

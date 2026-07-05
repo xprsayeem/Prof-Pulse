@@ -28,7 +28,7 @@ export function LiveStats({
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="rounded-xl border border-border bg-card p-5 text-center"
+          className="rounded-xl border border-border bg-card p-5 text-center shadow-soft"
         >
           <stat.icon className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
           <p className="font-display text-3xl font-medium tabular-nums">

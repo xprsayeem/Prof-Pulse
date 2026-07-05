@@ -47,9 +47,9 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
 
-  /* Brand colors */
-  --color-brand-blue: #004C9B;
-  --color-brand-gold: #FFDC00;
+  /* Brand accent (ochre) — logo, links, active states, highlights */
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
 
   /* Semantic (ratings, status) */
   --color-success: var(--success);
@@ -62,49 +62,55 @@
 .light {
   --radius: 0.625rem;
 
-  /* Neutrals — a faintly cool light canvas + slate ink */
-  --background: oklch(0.99 0.002 250);
-  --foreground: oklch(0.21 0.015 255);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.015 255);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.015 255);
+  /* Charcoal + ochre — warm oat canvas (never pure white), cream cards, warm
+     charcoal ink. Primary is a near-black charcoal (dark buttons); the brand
+     accent (ochre) carries highlights, links, and active states. */
+  --background: #EBE6D4;
+  --foreground: #33302B;
+  --card: #F5F1E2;
+  --card-foreground: #33302B;
+  --popover: #F5F1E2;
+  --popover-foreground: #33302B;
 
-  /* Accent — TMU blue (#004C9B) */
-  --primary: oklch(0.42 0.15 258);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.965 0.003 250);
-  --secondary-foreground: oklch(0.27 0.015 255);
-  --muted: oklch(0.965 0.003 250);
-  --muted-foreground: oklch(0.5 0.012 255);
-  --accent: oklch(0.95 0.02 255);
-  --accent-foreground: oklch(0.42 0.15 258);
+  /* Primary — charcoal (dark actions) */
+  --primary: #363330;
+  --primary-foreground: #F6F2E5;
+  --secondary: #E4DDC8;
+  --secondary-foreground: #3A362F;
+  --muted: #E6E0CD;
+  --muted-foreground: #6F6959;
+  --accent: #E2DAC4;
+  --accent-foreground: #363330;
+
+  /* Brand accent — ochre */
+  --brand: #A9762A;
+  --brand-foreground: #F6F2E5;
 
   /* Semantic — ratings & status */
-  --success: oklch(0.55 0.13 150);
-  --success-foreground: oklch(0.99 0 0);
-  --warning: oklch(0.62 0.13 72);
-  --warning-foreground: oklch(0.99 0 0);
-  --destructive: oklch(0.58 0.2 27);
+  --success: oklch(0.53 0.1 150);
+  --success-foreground: #F6F2E5;
+  --warning: oklch(0.62 0.13 68);
+  --warning-foreground: #33302B;
+  --destructive: oklch(0.55 0.16 30);
 
-  --border: oklch(0.9 0.004 250);
-  --input: oklch(0.9 0.004 250);
-  --ring: oklch(0.42 0.15 258);
+  --border: #DAD3BD;
+  --input: #DAD3BD;
+  --ring: #A9762A;
 
-  --chart-1: oklch(0.42 0.15 258);
-  --chart-2: oklch(0.62 0.13 72);
-  --chart-3: oklch(0.55 0.13 150);
-  --chart-4: oklch(0.55 0.2 300);
-  --chart-5: oklch(0.6 0.18 20);
+  --chart-1: #A9762A;
+  --chart-2: #363330;
+  --chart-3: #8C7A54;
+  --chart-4: #6F6959;
+  --chart-5: #C0862A;
 
-  --sidebar: oklch(0.985 0.002 250);
-  --sidebar-foreground: oklch(0.21 0.015 255);
-  --sidebar-primary: oklch(0.42 0.15 258);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.95 0.02 255);
-  --sidebar-accent-foreground: oklch(0.42 0.15 258);
-  --sidebar-border: oklch(0.9 0.004 250);
-  --sidebar-ring: oklch(0.42 0.15 258);
+  --sidebar: #F0EBDC;
+  --sidebar-foreground: #33302B;
+  --sidebar-primary: #363330;
+  --sidebar-primary-foreground: #F6F2E5;
+  --sidebar-accent: #E2DAC4;
+  --sidebar-accent-foreground: #363330;
+  --sidebar-border: #DAD3BD;
+  --sidebar-ring: #A9762A;
 }
 
 .dark {
@@ -153,6 +159,18 @@
     @apply bg-background text-foreground antialiased;
     min-height: 100vh;
   }
+}
+
+/* Soft, warm shadows for gentle card depth on the parchment canvas. */
+@utility shadow-soft {
+  box-shadow:
+    0 1px 2px oklch(0.3 0.03 60 / 0.05),
+    0 3px 10px oklch(0.3 0.03 60 / 0.05);
+}
+@utility shadow-soft-md {
+  box-shadow:
+    0 2px 5px oklch(0.3 0.03 60 / 0.06),
+    0 10px 24px oklch(0.3 0.03 60 / 0.08);
 }
 
 /* ============================================
@@ -505,7 +523,7 @@
 input:focus,
 button:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(0, 76, 155, 0.5);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 32%, transparent);
 }
 
 /* ============================================
