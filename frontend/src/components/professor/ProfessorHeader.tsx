@@ -24,15 +24,15 @@ export function ProfessorHeader({
 }: ProfessorHeaderProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.4 }}
     >
       {/* Navigation row */}
       <div className="flex items-center justify-between mb-6">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to search</span>
@@ -40,7 +40,7 @@ export function ProfessorHeader({
 
         <Link
           href={`/compare?mode=professors&items=${professor.professor_id}`}
-          className="inline-flex items-center gap-2 text-white/50 hover:text-brand-blue transition-colors"
+          className="inline-flex items-center gap-2 text-muted-foreground hover:text-brand transition-colors"
         >
           <GitCompare className="w-4 h-4" />
           <span>Compare</span>
@@ -48,53 +48,50 @@ export function ProfessorHeader({
       </div>
 
       {/* Professor header */}
-      <div className="glass p-8">
+      <div className="rounded-2xl border border-border bg-card p-8 shadow-soft">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="flex items-center gap-4">
-            {/* Avatar placeholder */}
-            <div className="w-16 h-16 rounded-full bg-brand-gold/20 flex items-center justify-center">
-              <User className="w-8 h-8 text-brand-gold" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand/12">
+              <User className="h-8 w-8 text-brand" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-1">
+              <h1 className="font-display text-4xl tracking-tight text-foreground">
                 {professor.professor_name}
               </h1>
-              <p className="text-white/50 text-lg">{professor.department}</p>
-              <div className="flex items-center gap-3 mt-1">
-                <span className="text-white/40 text-sm">
-                  {totalReviews.toLocaleString()} reviews
-                </span>
-                <span className="text-white/30">•</span>
-                <span className="text-white/40 text-sm">
+              <p className="text-muted-foreground text-lg">{professor.department}</p>
+              <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+                <span>{totalReviews.toLocaleString()} reviews</span>
+                <span className="text-border">•</span>
+                <span>
                   {totalCourses} course{totalCourses !== 1 ? "s" : ""}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Stats badges */}
-          <div className="flex items-center gap-6">
+          {/* Stats */}
+          <div className="flex items-center gap-5">
             <div className="text-center">
-              <div className="text-3xl font-bold text-brand-blue">
+              <div className="font-display text-3xl font-medium text-brand">
                 {avgQuality?.toFixed(1) || "N/A"}
               </div>
-              <div className="text-white/50 text-sm">Quality</div>
+              <div className="text-muted-foreground text-sm">Quality</div>
             </div>
-            <div className="h-12 w-px bg-white/10" />
+            <div className="h-12 w-px bg-border" />
             <div className="text-center">
-              <div className="text-3xl font-bold text-brand-gold">
+              <div className="font-display text-3xl font-medium text-foreground">
                 {avgDifficulty?.toFixed(1) || "N/A"}
               </div>
-              <div className="text-white/50 text-sm">Difficulty</div>
+              <div className="text-muted-foreground text-sm">Difficulty</div>
             </div>
             {avgWouldTakeAgain !== null && (
               <>
-                <div className="h-12 w-px bg-white/10" />
+                <div className="h-12 w-px bg-border" />
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-emerald-400">
+                  <div className="font-display text-3xl font-medium text-foreground">
                     {avgWouldTakeAgain.toFixed(0)}%
                   </div>
-                  <div className="text-white/50 text-sm">Would Retake</div>
+                  <div className="text-muted-foreground text-sm">Would retake</div>
                 </div>
               </>
             )}

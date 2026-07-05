@@ -83,14 +83,8 @@ export default async function ProfessorPage({ params }: ProfessorPageProps) {
       : null;
 
   return (
-    <main className="min-h-screen">
-      {/* Background gradient */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-brand-gold/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-brand-blue/10 rounded-full blur-3xl" />
-      </div>
-
-      <div className="relative z-10 max-w-5xl mx-auto px-4 py-12">
+    <main className="mx-auto max-w-5xl px-4 py-12">
+      <div>
         <ProfessorHeader
           professor={professor}
           totalReviews={totalReviews}
@@ -112,16 +106,16 @@ export default async function ProfessorPage({ params }: ProfessorPageProps) {
         </div>
 
         <div className="mt-12">
-          <h2 className="text-xl font-semibold text-white mb-4">
-            Courses Taught
+          <h2 className="font-display text-2xl text-foreground mb-4">
+            Courses taught
           </h2>
           <ProfessorCourses courses={professorRecords} />
         </div>
 
         {professorReviews.length > 0 && (
           <div className="mt-12">
-            <h2 className="text-xl font-semibold text-white mb-4">
-              Student Reviews ({professorReviews.length})
+            <h2 className="font-display text-2xl text-foreground mb-4">
+              Student reviews ({professorReviews.length})
             </h2>
             <ProfessorReviews reviews={professorReviews} />
           </div>

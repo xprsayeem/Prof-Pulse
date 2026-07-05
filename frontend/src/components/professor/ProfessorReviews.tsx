@@ -46,12 +46,14 @@ export function ProfessorReviews({ reviews }: ProfessorReviewsProps) {
   };
 
   const getGradeColor = (grade: string | null) => {
-    if (!grade) return "text-white/40";
-    if (grade.startsWith("A")) return "text-emerald-400";
-    if (grade.startsWith("B")) return "text-brand-blue";
-    if (grade.startsWith("C")) return "text-brand-gold";
-    return "text-red-400";
+    if (!grade) return "text-muted-foreground";
+    if (grade.startsWith("A")) return "text-brand";
+    if (grade.startsWith("F")) return "text-destructive";
+    return "text-foreground";
   };
+
+  const qualityColor = (q: number) =>
+    q >= 4 ? "text-brand" : q >= 3 ? "text-foreground" : "text-destructive";
 
   return (
     <div className="space-y-6">
@@ -60,7 +62,7 @@ export function ProfessorReviews({ reviews }: ProfessorReviewsProps) {
         {/* Sentiment filter */}
         <div className="flex gap-2">
           {[
-            { value: "all", label: "All Reviews" },
+            { value: "all", label: "All reviews" },
             { value: "positive", label: "Positive" },
             { value: "critical", label: "Critical" },
           ].map((option) => (
@@ -69,8 +71,8 @@ export function ProfessorReviews({ reviews }: ProfessorReviewsProps) {
               onClick={() => setFilter(option.value as typeof filter)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 filter === option.value
-                  ? "bg-brand-blue text-white"
-                  : "bg-white/5 text-white/50 hover:bg-white/10 hover:text-white"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground"
               }`}
             >
               {option.label}
@@ -83,13 +85,11 @@ export function ProfessorReviews({ reviews }: ProfessorReviewsProps) {
           <select
             value={courseFilter}
             onChange={(e) => setCourseFilter(e.target.value)}
-            className="px-4 py-2 rounded-lg bg-neutral-900 text-white border border-white/10 text-sm focus:outline-none focus:border-brand-blue/50"
+            className="px-4 py-2 rounded-lg bg-card text-foreground border border-border text-sm focus:outline-none focus:border-brand"
           >
-            <option value="all" className="bg-neutral-900 text-white">
-              All Courses
-            </option>
+            <option value="all">All courses</option>
             {courses.map((course) => (
-              <option key={course} value={course} className="bg-neutral-900 text-white">
+              <option key={course} value={course}>
                 {course}
               </option>
             ))}
@@ -98,7 +98,7 @@ export function ProfessorReviews({ reviews }: ProfessorReviewsProps) {
       </div>
 
       {/* Results count */}
-      <p className="text-white/40 text-sm">
+      <p className="text-muted-foreground text-sm">
         Showing {visibleReviews.length} of {filteredReviews.length} reviews
       </p>
 
@@ -107,46 +107,38 @@ export function ProfessorReviews({ reviews }: ProfessorReviewsProps) {
         {visibleReviews.map((review, index) => (
           <motion.div
             key={review.review_id}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.03 * index, duration: 0.4 }}
-            className="glass p-5"
+            transition={{ delay: Math.min(0.03 * index, 0.3), duration: 0.4 }}
+            className="rounded-xl border border-border bg-card p-5 shadow-soft"
           >
             {/* Header row */}
             <div className="flex flex-wrap items-center gap-4 mb-4">
               {/* Quality score */}
               <div className="flex items-center gap-2">
-                <div
-                  className={`text-lg font-bold ${
-                    getQuality(review) >= 4
-                      ? "text-emerald-400"
-                      : getQuality(review) >= 3
-                      ? "text-brand-gold"
-                      : "text-red-400"
-                  }`}
-                >
+                <div className={`text-lg font-medium ${qualityColor(getQuality(review))}`}>
                   {getQuality(review).toFixed(1)}
                 </div>
-                <span className="text-white/30 text-sm">quality</span>
+                <span className="text-muted-foreground text-sm">quality</span>
               </div>
 
-              <div className="h-4 w-px bg-white/10" />
+              <div className="h-4 w-px bg-border" />
 
               {/* Difficulty */}
               <div className="flex items-center gap-2">
-                <div className="text-lg font-bold text-brand-gold">
+                <div className="text-lg font-medium text-foreground">
                   {review.difficulty_rating?.toFixed(1) || "N/A"}
                 </div>
-                <span className="text-white/30 text-sm">difficulty</span>
+                <span className="text-muted-foreground text-sm">difficulty</span>
               </div>
 
-              <div className="h-4 w-px bg-white/10" />
+              <div className="h-4 w-px bg-border" />
 
               {/* Course */}
               {review.course_code && (
                 <Link
                   href={`/course/${review.course_code}`}
-                  className="flex items-center gap-1 text-white/50 text-sm hover:text-brand-blue transition-colors"
+                  className="flex items-center gap-1 text-muted-foreground text-sm hover:text-brand transition-colors"
                 >
                   <BookOpen className="w-4 h-4" />
                   <span>{review.course_code}</span>
@@ -154,14 +146,14 @@ export function ProfessorReviews({ reviews }: ProfessorReviewsProps) {
               )}
 
               {/* Date */}
-              <div className="flex items-center gap-1 text-white/40 text-sm ml-auto">
+              <div className="flex items-center gap-1 text-muted-foreground text-sm ml-auto">
                 <Calendar className="w-4 h-4" />
                 <span>{formatDate(review.date)}</span>
               </div>
             </div>
 
             {/* Comment */}
-            <p className="text-white/80 leading-relaxed mb-4">{review.comment}</p>
+            <p className="text-foreground/90 leading-relaxed mb-4">{review.comment}</p>
 
             {/* Footer row */}
             <div className="flex flex-wrap items-center gap-4 text-sm">
@@ -169,11 +161,11 @@ export function ProfessorReviews({ reviews }: ProfessorReviewsProps) {
               {review.would_take_again !== null && (
                 <div className="flex items-center gap-1">
                   {review.would_take_again === 1 ? (
-                    <ThumbsUp className="w-4 h-4 text-emerald-400" />
+                    <ThumbsUp className="w-4 h-4 text-brand" />
                   ) : (
-                    <ThumbsDown className="w-4 h-4 text-red-400" />
+                    <ThumbsDown className="w-4 h-4 text-destructive" />
                   )}
-                  <span className="text-white/50">
+                  <span className="text-muted-foreground">
                     {review.would_take_again === 1 ? "Would take again" : "Would not take again"}
                   </span>
                 </div>
@@ -182,7 +174,7 @@ export function ProfessorReviews({ reviews }: ProfessorReviewsProps) {
               {/* Grade */}
               {review.grade && (
                 <div className="flex items-center gap-1">
-                  <Award className="w-4 h-4 text-white/40" />
+                  <Award className="w-4 h-4 text-muted-foreground" />
                   <span className={getGradeColor(review.grade)}>Grade: {review.grade}</span>
                 </div>
               )}
@@ -196,9 +188,9 @@ export function ProfessorReviews({ reviews }: ProfessorReviewsProps) {
         <div className="text-center">
           <button
             onClick={() => setVisibleCount((c) => c + 10)}
-            className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl transition-colors"
+            className="px-6 py-3 rounded-xl border border-border bg-card text-foreground shadow-soft transition-colors hover:bg-accent"
           >
-            Load More Reviews ({filteredReviews.length - visibleCount} remaining)
+            Load more reviews ({filteredReviews.length - visibleCount} remaining)
           </button>
         </div>
       )}
@@ -206,8 +198,8 @@ export function ProfessorReviews({ reviews }: ProfessorReviewsProps) {
       {/* Empty state */}
       {filteredReviews.length === 0 && (
         <div className="text-center py-12">
-          <MessageSquare className="w-12 h-12 text-white/20 mx-auto mb-4" />
-          <p className="text-white/50">No reviews match your filters</p>
+          <MessageSquare className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
+          <p className="text-muted-foreground">No reviews match your filters</p>
         </div>
       )}
     </div>
