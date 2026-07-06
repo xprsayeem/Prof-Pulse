@@ -24,12 +24,10 @@ export function BirdCoursesList({ courses, departments }: BirdCoursesListProps) 
   const filteredAndSorted = useMemo(() => {
     let result = [...courses];
 
-    // Filter by department
     if (department !== "all") {
       result = result.filter((c) => c.department === department);
     }
 
-    // Filter by liberal category
     if (liberalFilter !== "all") {
       result = result.filter((c) => {
         const category = getLiberalCategory(c.course_code);
@@ -38,7 +36,6 @@ export function BirdCoursesList({ courses, departments }: BirdCoursesListProps) 
       });
     }
 
-    // Sort
     result.sort((a, b) => {
       switch (sortBy) {
         case "bird_score":
@@ -59,7 +56,6 @@ export function BirdCoursesList({ courses, departments }: BirdCoursesListProps) 
 
   const visibleCourses = filteredAndSorted.slice(0, visibleCount);
 
-  // Count liberals for display
   const liberalCounts = useMemo(() => {
     let lower = 0;
     let upper = 0;
@@ -72,25 +68,28 @@ export function BirdCoursesList({ courses, departments }: BirdCoursesListProps) 
     return { lower, upper, total: lower + upper };
   }, [courses, department]);
 
+  const selectClass =
+    "bg-card text-foreground border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand";
+
   return (
     <div className="space-y-6">
       {/* Filters */}
-      <div className="glass p-4 space-y-4">
+      <div className="rounded-xl border border-border bg-card p-4 shadow-soft space-y-4">
         {/* Top row: department + sort */}
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-white/40" />
+            <Filter className="w-4 h-4 text-muted-foreground" />
             <select
               value={department}
               onChange={(e) => {
                 setDepartment(e.target.value);
                 setVisibleCount(20);
               }}
-              className="bg-white/5 text-white border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-blue/50"
+              className={selectClass}
             >
-              <option value="all" className="bg-neutral-900">All Departments</option>
+              <option value="all">All departments</option>
               {departments.map((dept) => (
-                <option key={dept} value={dept} className="bg-neutral-900">
+                <option key={dept} value={dept}>
                   {dept}
                 </option>
               ))}
@@ -98,20 +97,20 @@ export function BirdCoursesList({ courses, departments }: BirdCoursesListProps) 
           </div>
 
           <div className="flex items-center gap-2">
-            <SortAsc className="w-4 h-4 text-white/40" />
+            <SortAsc className="w-4 h-4 text-muted-foreground" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className="bg-white/5 text-white border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand-blue/50"
+              className={selectClass}
             >
-              <option value="bird_score" className="bg-neutral-900">Bird Score</option>
-              <option value="a_rate" className="bg-neutral-900">A Rate</option>
-              <option value="difficulty" className="bg-neutral-900">Easiest First</option>
-              <option value="reviews" className="bg-neutral-900">Most Reviews</option>
+              <option value="bird_score">Bird score</option>
+              <option value="a_rate">A rate</option>
+              <option value="difficulty">Easiest first</option>
+              <option value="reviews">Most reviews</option>
             </select>
           </div>
 
-          <div className="ml-auto text-white/40 text-sm">
+          <div className="ml-auto text-muted-foreground text-sm">
             {filteredAndSorted.length} courses
           </div>
         </div>
@@ -119,10 +118,10 @@ export function BirdCoursesList({ courses, departments }: BirdCoursesListProps) 
         {/* Liberal filter buttons */}
         <div className="flex flex-wrap gap-2">
           {[
-            { id: "all" as const, label: "All Courses" },
-            { id: "any_liberal" as const, label: `All Liberals (${liberalCounts.total})` },
-            { id: "lower" as const, label: `Lower Liberal (${liberalCounts.lower})` },
-            { id: "upper" as const, label: `Upper Liberal (${liberalCounts.upper})` },
+            { id: "all" as const, label: "All courses" },
+            { id: "any_liberal" as const, label: `All liberals (${liberalCounts.total})` },
+            { id: "lower" as const, label: `Lower liberal (${liberalCounts.lower})` },
+            { id: "upper" as const, label: `Upper liberal (${liberalCounts.upper})` },
           ].map((option) => (
             <button
               key={option.id}
@@ -132,8 +131,8 @@ export function BirdCoursesList({ courses, departments }: BirdCoursesListProps) 
               }}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                 liberalFilter === option.id
-                  ? "bg-brand-blue text-white"
-                  : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground"
               }`}
             >
               {option.label}
@@ -147,7 +146,7 @@ export function BirdCoursesList({ courses, departments }: BirdCoursesListProps) 
         {visibleCourses.map((course, index) => (
           <motion.div
             key={course.course_code}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: Math.min(index * 0.03, 0.3), duration: 0.4 }}
           >
@@ -164,9 +163,9 @@ export function BirdCoursesList({ courses, departments }: BirdCoursesListProps) 
         <div className="text-center pt-4">
           <button
             onClick={() => setVisibleCount((c) => c + 20)}
-            className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl transition-colors"
+            className="px-6 py-3 rounded-xl border border-border bg-card text-foreground shadow-soft transition-colors hover:bg-accent"
           >
-            Load More ({filteredAndSorted.length - visibleCount} remaining)
+            Load more ({filteredAndSorted.length - visibleCount} remaining)
           </button>
         </div>
       )}
@@ -174,7 +173,7 @@ export function BirdCoursesList({ courses, departments }: BirdCoursesListProps) 
       {/* Empty state */}
       {filteredAndSorted.length === 0 && (
         <div className="text-center py-16">
-          <p className="text-white/50 text-lg">No bird courses found with these filters</p>
+          <p className="text-muted-foreground text-lg">No bird courses found with these filters</p>
         </div>
       )}
     </div>

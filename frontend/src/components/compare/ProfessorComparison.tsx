@@ -53,38 +53,10 @@ export function ProfessorComparison({
     .filter((p) => p.stats !== null) as { id: string; stats: NonNullable<ReturnType<typeof getProfessorStats>> }[];
 
   const metrics = [
-    {
-      label: "Quality",
-      getValue: (s: NonNullable<ReturnType<typeof getProfessorStats>>) => s.avgQuality,
-      format: (v: number | null) => v?.toFixed(1) || "N/A",
-      higherIsBetter: true,
-      icon: Star,
-      color: "text-brand-blue",
-    },
-    {
-      label: "Difficulty",
-      getValue: (s: NonNullable<ReturnType<typeof getProfessorStats>>) => s.avgDifficulty,
-      format: (v: number | null) => v?.toFixed(1) || "N/A",
-      higherIsBetter: false,
-      icon: TrendingDown,
-      color: "text-brand-gold",
-    },
-    {
-      label: "Would Retake",
-      getValue: (s: NonNullable<ReturnType<typeof getProfessorStats>>) => s.avgWouldTakeAgain,
-      format: (v: number | null) => (v ? `${v.toFixed(0)}%` : "N/A"),
-      higherIsBetter: true,
-      icon: ThumbsUp,
-      color: "text-emerald-400",
-    },
-    {
-      label: "Courses",
-      getValue: (s: NonNullable<ReturnType<typeof getProfessorStats>>) => s.courseCount,
-      format: (v: number | null) => v?.toString() || "0",
-      higherIsBetter: true,
-      icon: BookOpen,
-      color: "text-purple-400",
-    },
+    { label: "Quality", getValue: (s: NonNullable<ReturnType<typeof getProfessorStats>>) => s.avgQuality, format: (v: number | null) => v?.toFixed(1) || "N/A", higherIsBetter: true, icon: Star },
+    { label: "Difficulty", getValue: (s: NonNullable<ReturnType<typeof getProfessorStats>>) => s.avgDifficulty, format: (v: number | null) => v?.toFixed(1) || "N/A", higherIsBetter: false, icon: TrendingDown },
+    { label: "Would retake", getValue: (s: NonNullable<ReturnType<typeof getProfessorStats>>) => s.avgWouldTakeAgain, format: (v: number | null) => (v ? `${v.toFixed(0)}%` : "N/A"), higherIsBetter: true, icon: ThumbsUp },
+    { label: "Courses", getValue: (s: NonNullable<ReturnType<typeof getProfessorStats>>) => s.courseCount, format: (v: number | null) => v?.toString() || "0", higherIsBetter: true, icon: BookOpen },
   ];
 
   const getWinner = (getValue: (s: NonNullable<ReturnType<typeof getProfessorStats>>) => number | null, higherIsBetter: boolean) => {
@@ -112,19 +84,19 @@ export function ProfessorComparison({
         {selectedProfs.map(({ id, stats }, index) => (
           <motion.div
             key={id}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="glass p-4 text-center"
+            transition={{ delay: index * 0.08 }}
+            className="rounded-xl border border-border bg-card p-4 text-center shadow-soft"
           >
             <Link href={`/professor/${id}`} className="group">
-              <h3 className="text-xl font-bold text-white group-hover:text-brand-blue transition-colors flex items-center justify-center gap-2">
+              <h3 className="font-display text-xl text-foreground group-hover:text-brand transition-colors flex items-center justify-center gap-2">
                 {stats.name}
                 <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
               </h3>
             </Link>
-            <p className="text-white/50 text-sm mt-1">{stats.department}</p>
-            <p className="text-white/40 text-xs mt-1">
+            <p className="text-muted-foreground text-sm mt-1">{stats.department}</p>
+            <p className="text-muted-foreground text-xs mt-1">
               {stats.totalReviews.toLocaleString()} reviews
             </p>
           </motion.div>
@@ -132,13 +104,13 @@ export function ProfessorComparison({
       </div>
 
       {/* Metrics comparison */}
-      <div className="glass overflow-hidden">
+      <div className="rounded-xl border border-border bg-card overflow-hidden shadow-soft">
         {metrics.map((metric, i) => {
           const winner = getWinner(metric.getValue, metric.higherIsBetter);
           return (
             <div
               key={metric.label}
-              className={`grid gap-4 p-4 ${i !== metrics.length - 1 ? "border-b border-white/10" : ""}`}
+              className={`grid gap-4 p-4 ${i !== metrics.length - 1 ? "border-b border-border" : ""}`}
               style={{ gridTemplateColumns: `repeat(${selectedProfs.length}, 1fr)` }}
             >
               {selectedProfs.map(({ id, stats }) => {
@@ -149,16 +121,16 @@ export function ProfessorComparison({
                   <div
                     key={id}
                     className={`text-center p-3 rounded-lg transition-colors ${
-                      isWinner ? "bg-brand-blue/10" : ""
+                      isWinner ? "bg-brand/10" : ""
                     }`}
                   >
                     <div className="flex items-center justify-center gap-2 mb-1">
-                      <metric.icon className={`w-4 h-4 ${metric.color}`} />
-                      <span className="text-white/50 text-sm">{metric.label}</span>
+                      <metric.icon className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-muted-foreground text-sm">{metric.label}</span>
                     </div>
-                    <p className={`text-2xl font-bold ${isWinner ? "text-brand-blue" : "text-white"}`}>
+                    <p className={`font-display text-2xl font-medium ${isWinner ? "text-brand" : "text-foreground"}`}>
                       {metric.format(value)}
-                      {isWinner && <Trophy className="w-4 h-4 inline ml-2 text-brand-gold" />}
+                      {isWinner && <Trophy className="w-4 h-4 inline ml-2 text-brand" />}
                     </p>
                   </div>
                 );
@@ -169,8 +141,8 @@ export function ProfessorComparison({
       </div>
 
       {/* Top courses for each */}
-      <div className="glass p-4">
-        <h4 className="text-white/60 text-sm mb-4 text-center">Top Courses</h4>
+      <div className="rounded-xl border border-border bg-card p-4 shadow-soft">
+        <h4 className="text-muted-foreground text-sm mb-4 text-center">Top courses</h4>
         <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${selectedProfs.length}, 1fr)` }}>
           {selectedProfs.map(({ id, stats }) => (
             <div key={id} className="space-y-2">
@@ -178,10 +150,10 @@ export function ProfessorComparison({
                 <Link
                   key={course.course_code}
                   href={`/course/${course.course_code}`}
-                  className="block bg-white/5 hover:bg-white/10 rounded-lg p-2 transition-colors"
+                  className="block rounded-lg bg-secondary hover:bg-accent p-2 transition-colors"
                 >
-                  <p className="text-white font-medium text-sm">{course.course_code}</p>
-                  <p className="text-white/50 text-xs">
+                  <p className="text-foreground font-medium text-sm">{course.course_code}</p>
+                  <p className="text-muted-foreground text-xs">
                     {course.prof_avg_quality?.toFixed(1)} quality • {course.section_reviews} reviews
                   </p>
                 </Link>

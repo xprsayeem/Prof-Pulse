@@ -17,39 +17,31 @@ export default async function BirdCoursesPage() {
   ).sort();
 
   return (
-    <main className="min-h-screen">
-      {/* Background gradient */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/3 w-96 h-96 bg-brand-gold/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-blue/10 rounded-full blur-3xl" />
+    <main className="mx-auto max-w-6xl px-4 py-12">
+      {/* Back button */}
+      <Link
+        href="/"
+        className="mb-8 inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span>Back to search</span>
+      </Link>
+
+      {/* Header */}
+      <div className="text-center mb-12">
+        <h1 className="font-display text-4xl md:text-5xl tracking-tight text-foreground mb-3">
+          Bird courses
+        </h1>
+        <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+          Find the easiest courses at TMU, ranked by grade distribution,
+          difficulty ratings, and student feedback.
+        </p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {birdCourses.length} courses analyzed
+        </p>
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-12">
-        {/* Back button */}
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors mb-8"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to search</span>
-        </Link>
-
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            🐦 Bird Courses
-          </h1>
-          <p className="text-xl text-white/60 max-w-2xl mx-auto">
-            Find the easiest courses at TMU. Ranked by grade distribution, 
-            difficulty ratings, and student feedback.
-          </p>
-          <p className="text-white/40 mt-2">
-            {birdCourses.length} courses analyzed
-          </p>
-        </div>
-
-        <BirdCoursesList courses={birdCourses} departments={departments} />
-      </div>
+      <BirdCoursesList courses={birdCourses} departments={departments} />
     </main>
   );
 }

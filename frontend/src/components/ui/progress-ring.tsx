@@ -19,8 +19,8 @@ export function ProgressRing({
   max = 100,
   size = 80,
   strokeWidth = 6,
-  color = "#004C9B",
-  bgColor = "rgba(255, 255, 255, 0.1)",
+  color = "#A9762A",
+  bgColor = "rgba(51, 48, 43, 0.12)",
   showValue = true,
   label,
   className = "",
@@ -100,18 +100,15 @@ export function ProgressRing({
           strokeDasharray={circumference}
           strokeDashoffset={isVisible ? offset : circumference}
           className="progress-ring-circle"
-          style={{
-            filter: `drop-shadow(0 0 6px ${color}40)`,
-          }}
         />
       </svg>
       {showValue && (
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-xl font-bold text-white tabular-nums">
+          <span className="font-display text-xl font-medium text-foreground tabular-nums">
             {Math.round(animatedValue)}
           </span>
           {label && (
-            <span className="text-xs text-white/50">{label}</span>
+            <span className="text-xs text-muted-foreground">{label}</span>
           )}
         </div>
       )}

@@ -18,7 +18,6 @@ interface CompareMetric {
   format: (value: number | null) => string;
   higherIsBetter: boolean;
   icon: React.ElementType;
-  color: string;
 }
 
 export function CourseComparison({
@@ -55,54 +54,12 @@ export function CourseComparison({
   };
 
   const metrics: CompareMetric[] = [
-    {
-      label: "Quality",
-      getValue: (c) => c.avg_quality,
-      format: (v) => v?.toFixed(1) || "N/A",
-      higherIsBetter: true,
-      icon: Star,
-      color: "text-brand-blue",
-    },
-    {
-      label: "Difficulty",
-      getValue: (c) => c.avg_difficulty,
-      format: (v) => v?.toFixed(1) || "N/A",
-      higherIsBetter: false,
-      icon: TrendingDown,
-      color: "text-brand-gold",
-    },
-    {
-      label: "Would Retake",
-      getValue: (c) => c.would_take_again_pct,
-      format: (v) => (v ? `${v.toFixed(0)}%` : "N/A"),
-      higherIsBetter: true,
-      icon: ThumbsUp,
-      color: "text-emerald-400",
-    },
-    {
-      label: "Bird Score",
-      getValue: (c, b) => b?.bird_score || null,
-      format: (v) => v?.toFixed(0) || "N/A",
-      higherIsBetter: true,
-      icon: Trophy,
-      color: "text-purple-400",
-    },
-    {
-      label: "A Rate",
-      getValue: (c, b) => b?.a_rate || null,
-      format: (v) => (v ? `${v.toFixed(0)}%` : "N/A"),
-      higherIsBetter: true,
-      icon: Trophy,
-      color: "text-emerald-400",
-    },
-    {
-      label: "Reviews",
-      getValue: (c) => c.total_reviews,
-      format: (v) => v?.toLocaleString() || "0",
-      higherIsBetter: true,
-      icon: Users,
-      color: "text-white/60",
-    },
+    { label: "Quality", getValue: (c) => c.avg_quality, format: (v) => v?.toFixed(1) || "N/A", higherIsBetter: true, icon: Star },
+    { label: "Difficulty", getValue: (c) => c.avg_difficulty, format: (v) => v?.toFixed(1) || "N/A", higherIsBetter: false, icon: TrendingDown },
+    { label: "Would retake", getValue: (c) => c.would_take_again_pct, format: (v) => (v ? `${v.toFixed(0)}%` : "N/A"), higherIsBetter: true, icon: ThumbsUp },
+    { label: "Bird score", getValue: (c, b) => b?.bird_score || null, format: (v) => v?.toFixed(0) || "N/A", higherIsBetter: true, icon: Trophy },
+    { label: "A rate", getValue: (c, b) => b?.a_rate || null, format: (v) => (v ? `${v.toFixed(0)}%` : "N/A"), higherIsBetter: true, icon: Trophy },
+    { label: "Reviews", getValue: (c) => c.total_reviews, format: (v) => v?.toLocaleString() || "0", higherIsBetter: true, icon: Users },
   ];
 
   // Find winner for each metric
@@ -122,7 +79,6 @@ export function CourseComparison({
       return (a.value || 0) - (b.value || 0);
     });
 
-    // Only return winner if there's a clear difference
     if (sorted[0].value === sorted[1].value) return null;
     return sorted[0].code;
   };
@@ -158,20 +114,18 @@ export function CourseComparison({
         {selectedCourses.map((course, index) => (
           <motion.div
             key={course.course_code}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            whileHover={{ y: -2 }}
-            className="glass p-4 text-center relative overflow-hidden group"
+            transition={{ delay: index * 0.08 }}
+            className="rounded-xl border border-border bg-card p-4 text-center shadow-soft"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <Link href={`/course/${course.course_code}`} className="relative z-10 group/link">
-              <h3 className="text-xl font-bold text-white group-hover/link:text-brand-blue transition-colors flex items-center justify-center gap-2">
+            <Link href={`/course/${course.course_code}`} className="group/link">
+              <h3 className="font-display text-xl text-foreground group-hover/link:text-brand transition-colors flex items-center justify-center gap-2">
                 {course.course_code}
                 <ExternalLink className="w-4 h-4 opacity-0 group-hover/link:opacity-100 transition-opacity" />
               </h3>
             </Link>
-            <p className="text-white/50 text-sm mt-1 relative z-10">
+            <p className="text-muted-foreground text-sm mt-1">
               {course.total_reviews.toLocaleString()} reviews
             </p>
           </motion.div>
@@ -179,16 +133,13 @@ export function CourseComparison({
       </div>
 
       {/* Metrics comparison */}
-      <div className="glass overflow-hidden">
+      <div className="rounded-xl border border-border bg-card overflow-hidden shadow-soft">
         {metrics.map((metric, i) => {
           const winner = getWinner(metric);
           return (
-            <motion.div
+            <div
               key={metric.label}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 + i * 0.05 }}
-              className={`grid gap-4 p-4 ${i !== metrics.length - 1 ? "border-b border-white/10" : ""}`}
+              className={`grid gap-4 p-4 ${i !== metrics.length - 1 ? "border-b border-border" : ""}`}
               style={{ gridTemplateColumns: `repeat(${selectedCourses.length}, 1fr)` }}
             >
               {selectedCourses.map((course, courseIndex) => {
@@ -200,40 +151,34 @@ export function CourseComparison({
                 return (
                   <div
                     key={course.course_code}
-                    className={`text-center p-3 rounded-lg transition-all duration-300 relative overflow-hidden ${
-                      isWinner ? "bg-brand-blue/10" : "hover:bg-white/5"
+                    className={`text-center p-3 rounded-lg transition-colors relative overflow-hidden ${
+                      isWinner ? "bg-brand/10" : "hover:bg-accent"
                     }`}
                   >
-                    {/* Comparison bar background */}
                     <motion.div
-                      className="absolute bottom-0 left-0 h-1 bg-brand-blue/30 rounded-full"
+                      className="absolute bottom-0 left-0 h-1 bg-brand/40 rounded-full"
                       initial={{ width: 0 }}
                       animate={{ width: `${barWidth}%` }}
-                      transition={{ delay: 0.4 + courseIndex * 0.1, duration: 0.6, ease: "easeOut" }}
+                      transition={{ delay: 0.2 + courseIndex * 0.08, duration: 0.5, ease: "easeOut" }}
                     />
 
-                    <div className="flex items-center justify-center gap-2 mb-1 relative z-10">
-                      <metric.icon className={`w-4 h-4 ${metric.color}`} />
-                      <span className="text-white/50 text-sm">{metric.label}</span>
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <metric.icon className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-muted-foreground text-sm">{metric.label}</span>
                     </div>
-                    <div className="flex items-center justify-center gap-2 relative z-10">
-                      <p className={`text-2xl font-bold tabular-nums ${isWinner ? "text-brand-blue" : "text-white"}`}>
+                    <div className="flex items-center justify-center gap-2">
+                      <p className={`font-display text-2xl font-medium tabular-nums ${isWinner ? "text-brand" : "text-foreground"}`}>
                         {metric.format(value)}
                       </p>
                       <AnimatePresence>
                         {isWinner && (
                           <motion.div
-                            initial={{ scale: 0, rotate: -180 }}
-                            animate={{ scale: 1, rotate: 0 }}
-                            exit={{ scale: 0, rotate: 180 }}
-                            transition={{
-                              type: "spring",
-                              stiffness: 500,
-                              damping: 15,
-                              delay: 0.3,
-                            }}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0 }}
+                            transition={{ type: "spring", stiffness: 500, damping: 15, delay: 0.2 }}
                           >
-                            <Trophy className="w-5 h-5 text-brand-gold" style={{ filter: "drop-shadow(0 0 4px rgba(255, 220, 0, 0.5))" }} />
+                            <Trophy className="w-5 h-5 text-brand" />
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -241,47 +186,36 @@ export function CourseComparison({
                   </div>
                 );
               })}
-            </motion.div>
+            </div>
           );
         })}
       </div>
 
       {/* Top professor for each */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="glass p-4"
-      >
-        <h4 className="text-white/60 text-sm mb-4 text-center">Top Professor</h4>
+      <div className="rounded-xl border border-border bg-card p-4 shadow-soft">
+        <h4 className="text-muted-foreground text-sm mb-4 text-center">Top professor</h4>
         <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${selectedCourses.length}, 1fr)` }}>
-          {selectedCourses.map((course, index) => {
+          {selectedCourses.map((course) => {
             const topProf = getTopProfessor(course.course_code);
             return (
-              <motion.div
-                key={course.course_code}
-                className="text-center"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 + index * 0.1 }}
-              >
+              <div key={course.course_code} className="text-center">
                 {topProf ? (
                   <Link href={`/professor/${topProf.professor_id}`} className="group">
-                    <p className="text-white font-medium group-hover:text-brand-blue transition-colors">
+                    <p className="text-foreground font-medium group-hover:text-brand transition-colors">
                       {topProf.professor_name}
                     </p>
-                    <p className="text-white/50 text-sm">
-                      {topProf.prof_avg_quality?.toFixed(1) || "N/A"} quality - {topProf.section_reviews} reviews
+                    <p className="text-muted-foreground text-sm">
+                      {topProf.prof_avg_quality?.toFixed(1) || "N/A"} quality · {topProf.section_reviews} reviews
                     </p>
                   </Link>
                 ) : (
-                  <p className="text-white/40">No data</p>
+                  <p className="text-muted-foreground">No data</p>
                 )}
-              </motion.div>
+              </div>
             );
           })}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

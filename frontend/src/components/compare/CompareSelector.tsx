@@ -83,21 +83,21 @@ export function CompareSelector({
   };
 
   return (
-    <div className="glass p-6 space-y-4">
+    <div className="rounded-xl border border-border bg-card p-6 shadow-soft space-y-4">
       {/* Course filter for course-professors mode */}
       {mode === "course-professors" && (
         <div className="mb-4">
-          <label className="block text-white/60 text-sm mb-2">
+          <label className="block text-muted-foreground text-sm mb-2">
             Select a course first:
           </label>
           <select
             value={courseFilter || ""}
             onChange={(e) => onCourseFilterChange(e.target.value || null)}
-            className="w-full md:w-64 px-4 py-2 rounded-lg bg-white/5 text-white border border-white/10 text-sm focus:outline-none focus:border-brand-blue/50"
+            className="w-full md:w-64 px-4 py-2 rounded-lg bg-card text-foreground border border-border text-sm focus:outline-none focus:border-brand"
           >
-            <option value="" className="bg-neutral-900">Choose a course...</option>
+            <option value="">Choose a course...</option>
             {courses.map((c) => (
-              <option key={c.course_code} value={c.course_code} className="bg-neutral-900">
+              <option key={c.course_code} value={c.course_code}>
                 {c.course_code}
               </option>
             ))}
@@ -113,19 +113,19 @@ export function CompareSelector({
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="flex items-center gap-2 bg-brand-blue/20 text-brand-blue px-3 py-1.5 rounded-full"
+            className="flex items-center gap-2 bg-brand/15 text-brand px-3 py-1.5 rounded-full"
           >
             <span className="font-medium">{getSelectedLabel(item)}</span>
             <button
               onClick={() => onRemoveItem(item)}
-              className="hover:bg-brand-blue/20 rounded-full p-0.5"
+              className="hover:bg-brand/20 rounded-full p-0.5"
             >
               <X className="w-4 h-4" />
             </button>
           </motion.div>
         ))}
         {selectedItems.length < 4 && (mode !== "course-professors" || courseFilter) && (
-          <span className="text-white/30 text-sm py-1.5">
+          <span className="text-muted-foreground text-sm py-1.5">
             {selectedItems.length === 0
               ? `Add ${mode === "courses" ? "courses" : "professors"} to compare`
               : `${4 - selectedItems.length} more slots available`}
@@ -137,7 +137,7 @@ export function CompareSelector({
       {selectedItems.length < 4 && (mode !== "course-professors" || courseFilter) && (
         <div className="relative">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               value={query}
@@ -148,7 +148,7 @@ export function CompareSelector({
               onFocus={() => setIsOpen(true)}
               onBlur={() => setTimeout(() => setIsOpen(false), 200)}
               placeholder={`Search ${mode === "courses" ? "courses" : "professors"}...`}
-              className="w-full bg-white/5 text-white placeholder:text-white/40 pl-10 pr-4 py-3 rounded-lg border border-white/10 focus:border-brand-blue/50 focus:outline-none"
+              className="w-full bg-card text-foreground placeholder:text-muted-foreground pl-10 pr-4 py-3 rounded-lg border border-border focus:border-brand focus:outline-none"
             />
           </div>
 
@@ -156,10 +156,10 @@ export function CompareSelector({
           <AnimatePresence>
             {isOpen && suggestions.length > 0 && (
               <motion.div
-                initial={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute top-full left-0 right-0 mt-2 bg-neutral-900 border border-white/10 rounded-lg overflow-hidden z-50"
+                exit={{ opacity: 0, y: -8 }}
+                className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-lg overflow-hidden z-50 shadow-soft-md"
               >
                 {suggestions.map((s) => (
                   <button
@@ -169,13 +169,13 @@ export function CompareSelector({
                       setQuery("");
                       setIsOpen(false);
                     }}
-                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/5 transition-colors text-left"
+                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-accent transition-colors text-left"
                   >
                     <div>
-                      <p className="text-white font-medium">{s.label}</p>
-                      <p className="text-white/50 text-sm">{s.sublabel}</p>
+                      <p className="text-foreground font-medium">{s.label}</p>
+                      <p className="text-muted-foreground text-sm">{s.sublabel}</p>
                     </div>
-                    <Plus className="w-4 h-4 text-white/40" />
+                    <Plus className="w-4 h-4 text-muted-foreground" />
                   </button>
                 ))}
               </motion.div>

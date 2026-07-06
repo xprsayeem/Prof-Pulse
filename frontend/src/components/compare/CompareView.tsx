@@ -96,8 +96,8 @@ export function CompareView({
             onClick={() => handleModeChange(m.id)}
             className={`relative flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
               mode === m.id
-                ? "text-white"
-                : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+                ? "text-primary-foreground"
+                : "bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground"
             }`}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -105,7 +105,7 @@ export function CompareView({
             {mode === m.id && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute inset-0 bg-brand-blue rounded-lg"
+                className="absolute inset-0 bg-primary rounded-lg"
                 initial={false}
                 transition={{
                   type: "spring",
@@ -189,13 +189,13 @@ export function CompareView({
                 ease: "easeInOut",
               }}
             >
-              <GitCompare className="w-16 h-16 text-white/20 mx-auto mb-4" />
+              <GitCompare className="w-16 h-16 text-muted-foreground/40 mx-auto mb-4" />
             </motion.div>
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-white/50 text-lg"
+              className="text-muted-foreground text-lg"
             >
               Select at least 2 {mode === "courses" ? "courses" : "professors"} to compare
             </motion.p>
@@ -203,7 +203,7 @@ export function CompareView({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-white/30 text-sm mt-2"
+              className="text-muted-foreground/70 text-sm mt-2"
             >
               Use the search above to add items
             </motion.p>
