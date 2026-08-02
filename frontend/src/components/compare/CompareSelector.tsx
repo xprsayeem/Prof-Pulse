@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Course, CourseProfessor } from "@/lib/types";
+import { CourseIndex, ProfessorIndex, CourseProfessor } from "@/lib/types";
 import { Search, X, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -9,9 +9,10 @@ interface CompareSelectorProps {
   mode: "courses" | "professors" | "course-professors";
   selectedItems: string[];
   courseFilter: string | null;
-  courses: Course[];
-  professors: CourseProfessor[];
-  allProfessors: CourseProfessor[];
+  courseIndex: CourseIndex[];
+  professorIndex: ProfessorIndex[];
+  /** Professors scoped to the chosen course (course-professors mode). */
+  courseProfs: CourseProfessor[];
   onAddItem: (item: string) => void;
   onRemoveItem: (item: string) => void;
   onCourseFilterChange: (course: string | null) => void;
@@ -21,9 +22,9 @@ export function CompareSelector({
   mode,
   selectedItems,
   courseFilter,
-  courses,
-  professors,
-  allProfessors,
+  courseIndex,
+  professorIndex,
+  courseProfs,
   onAddItem,
   onRemoveItem,
   onCourseFilterChange,
@@ -34,14 +35,6 @@ export function CompareSelector({
   // In "professors in course" mode the first step is picking the course.
   const pickingCourse = mode === "course-professors" && !courseFilter;
 
-  // Professors available to add (scoped to the chosen course when applicable).
-  const availableProfessors = useMemo(() => {
-    if (mode === "course-professors" && courseFilter) {
-      return allProfessors.filter((p) => p.course_code === courseFilter);
-    }
-    return professors;
-  }, [mode, courseFilter, professors, allProfessors]);
-
   // Search suggestions — courses when picking a course or in course mode,
   // professors otherwise.
   const suggestions = useMemo(() => {
@@ -49,7 +42,7 @@ export function CompareSelector({
     const q = query.toLowerCase();
 
     if (pickingCourse || mode === "courses") {
-      return courses
+      return courseIndex
         .filter(
           (c) =>
             c.course_code.toLowerCase().includes(q) &&
@@ -63,7 +56,24 @@ export function CompareSelector({
         }));
     }
 
-    return availableProfessors
+    // course-professors mode (course chosen): search the scoped professor list.
+    if (mode === "course-professors") {
+      return courseProfs
+        .filter(
+          (p) =>
+            p.professor_name.toLowerCase().includes(q) &&
+            !selectedItems.includes(p.professor_id)
+        )
+        .slice(0, 6)
+        .map((p) => ({
+          id: p.professor_id,
+          label: p.professor_name,
+          sublabel: `${p.section_reviews} reviews for ${p.course_code}`,
+        }));
+    }
+
+    // professors mode: search the global professor index.
+    return professorIndex
       .filter(
         (p) =>
           p.professor_name.toLowerCase().includes(q) &&
@@ -73,17 +83,16 @@ export function CompareSelector({
       .map((p) => ({
         id: p.professor_id,
         label: p.professor_name,
-        sublabel:
-          mode === "course-professors"
-            ? `${p.section_reviews} reviews for ${p.course_code}`
-            : p.department,
+        sublabel: p.department,
       }));
-  }, [query, mode, pickingCourse, courses, availableProfessors, selectedItems]);
+  }, [query, mode, pickingCourse, courseIndex, professorIndex, courseProfs, selectedItems]);
 
   const getSelectedLabel = (id: string) => {
     if (mode === "courses") return id;
-    const prof = professors.find((p) => p.professor_id === id);
-    return prof?.professor_name || id;
+    if (mode === "course-professors") {
+      return courseProfs.find((p) => p.professor_id === id)?.professor_name || id;
+    }
+    return professorIndex.find((p) => p.professor_id === id)?.professor_name || id;
   };
 
   const handleSelect = (id: string) => {

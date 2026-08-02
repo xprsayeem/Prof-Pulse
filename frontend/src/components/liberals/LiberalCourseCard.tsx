@@ -1,4 +1,4 @@
-import { BirdCourse, Course } from "@/lib/types";
+import { BirdCourse, CourseIndex } from "@/lib/types";
 import { LiberalCourse } from "@/lib/liberals";
 import Link from "next/link";
 import { Star, TrendingDown, BarChart3, MessageSquare } from "lucide-react";
@@ -6,7 +6,7 @@ import { Star, TrendingDown, BarChart3, MessageSquare } from "lucide-react";
 interface LiberalCourseCardProps {
   liberal: LiberalCourse;
   bird?: BirdCourse;
-  course?: Course;
+  course?: CourseIndex;
 }
 
 export function LiberalCourseCard({ liberal, bird, course }: LiberalCourseCardProps) {

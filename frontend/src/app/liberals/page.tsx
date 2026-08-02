@@ -1,4 +1,3 @@
-import { getBirdCourses, getCourses } from "@/lib/api";
 import { LiberalsList } from "@/components/liberals/LiberalsList";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -9,12 +8,9 @@ export const metadata = {
   description: "Browse all TMU liberal studies courses with student ratings and reviews.",
 };
 
-export default async function LiberalsPage() {
-  const [birdCourses, courses] = await Promise.all([
-    getBirdCourses(),
-    getCourses(),
-  ]);
-
+// Static shell — LiberalsList pulls its (public, static) data straight from S3 in
+// the browser, so this page never runs a server function or moves origin data.
+export default function LiberalsPage() {
   const lowerCount = LIBERAL_COURSES.filter((c) => c.level === "lower").length;
   const upperCount = LIBERAL_COURSES.filter((c) => c.level === "upper").length;
 
@@ -41,7 +37,7 @@ export default async function LiberalsPage() {
         </p>
       </div>
 
-      <LiberalsList birdCourses={birdCourses} courses={courses} />
+      <LiberalsList />
     </main>
   );
 }

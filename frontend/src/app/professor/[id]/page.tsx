@@ -6,8 +6,11 @@ import { ProfessorStats } from "@/components/professor/ProfessorStats";
 import { ProfessorCourses } from "@/components/professor/ProfessorCourses";
 import { ProfessorReviews } from "@/components/professor/ProfessorReviews";
 
-// Rendered on demand and cached; revalidated daily against the export.
-export const revalidate = 86400;
+// Rendered on demand and cached. The export data is effectively static between
+// pipeline runs, so hold the cache for 30 days — this stops search-engine crawls
+// from regenerating thousands of pages daily. A redeploy busts the cache when the
+// data is refreshed.
+export const revalidate = 2592000;
 
 interface ProfessorPageProps {
   params: Promise<{ id: string }>;

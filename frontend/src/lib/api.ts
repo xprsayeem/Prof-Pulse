@@ -18,8 +18,10 @@ async function fetchJSON<T>(path: string, retries = 3): Promise<T[]> {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const res = await fetch(`${S3_BASE}/${path}.json`, {
-        // Static data exports — cache and revalidate rather than re-pulling.
-        next: { revalidate: 300 },
+        // Static data exports that only change when the pipeline re-runs (and a
+        // redeploy busts this cache anyway). Cache for a day so server renders
+        // don't re-pull the same shards from S3 every few minutes.
+        next: { revalidate: 86400 },
       });
 
       // A missing shard means "no data for this key" (e.g. a course with no
@@ -112,17 +114,4 @@ export async function getBirdCourses(): Promise<BirdCourse[]> {
 
 export async function getDepartments(): Promise<Department[]> {
   return fetchJSON<Department>("department_overview_gold");
-}
-
-// ---------------------------------------------------------------------------
-// Monolithic whole-table fetches — still used by the compare & liberals pages,
-// which need the full course / professor lists. (Hot pages use shards above.)
-// ---------------------------------------------------------------------------
-
-export async function getCourses(): Promise<Course[]> {
-  return fetchJSON<Course>("course_metrics_gold");
-}
-
-export async function getCourseProfessors(): Promise<CourseProfessor[]> {
-  return fetchJSON<CourseProfessor>("course_professor_comparison_gold");
 }

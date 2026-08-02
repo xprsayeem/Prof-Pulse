@@ -1,27 +1,46 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { BirdCourse, Course } from "@/lib/types";
+import { useState, useMemo, useEffect } from "react";
+import { BirdCourse, CourseIndex } from "@/lib/types";
+import { getBirdCourses, getCoursesIndex } from "@/lib/api";
 import { LIBERAL_COURSES, LiberalCourse } from "@/lib/liberals";
 import { LiberalCourseCard } from "./LiberalCourseCard";
 import { motion } from "framer-motion";
-import { Search } from "lucide-react";
-
-interface LiberalsListProps {
-  birdCourses: BirdCourse[];
-  courses: Course[];
-}
+import { Search, Loader2 } from "lucide-react";
 
 type LevelFilter = "all" | "lower" | "upper";
 type DataFilter = "all" | "has_reviews" | "no_reviews";
 type SortOption = "code" | "bird_score" | "difficulty" | "quality";
 
-export function LiberalsList({ birdCourses, courses }: LiberalsListProps) {
+export function LiberalsList() {
   const [level, setLevel] = useState<LevelFilter>("all");
   const [dataFilter, setDataFilter] = useState<DataFilter>("all");
   const [sortBy, setSortBy] = useState<SortOption>("bird_score");
   const [search, setSearch] = useState("");
   const [visibleCount, setVisibleCount] = useState(30);
+
+  // Data is fetched in the browser straight from S3 (public, static). The bird
+  // file carries the rich metrics; the lightweight course index (~0.6 MB vs the
+  // 2 MB full table) covers quality/difficulty/review counts for the rest.
+  const [birdCourses, setBirdCourses] = useState<BirdCourse[]>([]);
+  const [courses, setCourses] = useState<CourseIndex[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([getBirdCourses(), getCoursesIndex()])
+      .then(([birds, index]) => {
+        if (!active) return;
+        setBirdCourses(birds);
+        setCourses(index);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const birdMap = useMemo(() => {
     const map = new Map<string, BirdCourse>();
@@ -30,7 +49,7 @@ export function LiberalsList({ birdCourses, courses }: LiberalsListProps) {
   }, [birdCourses]);
 
   const courseMap = useMemo(() => {
-    const map = new Map<string, Course>();
+    const map = new Map<string, CourseIndex>();
     courses.forEach((c) => map.set(c.course_code, c));
     return map;
   }, [courses]);
@@ -97,6 +116,15 @@ export function LiberalsList({ birdCourses, courses }: LiberalsListProps) {
 
   const selectClass =
     "bg-card text-foreground border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand";
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 text-muted-foreground">
+        <Loader2 className="w-6 h-6 animate-spin mb-3" />
+        <p className="text-sm">Loading courses…</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

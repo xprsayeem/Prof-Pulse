@@ -1,4 +1,4 @@
-import { getCourses, getCourseProfessors, getBirdCourses } from "@/lib/api";
+import { Suspense } from "react";
 import { CompareView } from "@/components/compare/CompareView";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -8,26 +8,10 @@ export const metadata = {
   description: "Compare courses and professors at TMU side-by-side.",
 };
 
-interface ComparePageProps {
-  searchParams: Promise<{
-    mode?: string;
-    items?: string;
-    course?: string;
-  }>;
-}
-
-export default async function ComparePage({ searchParams }: ComparePageProps) {
-  const params = await searchParams;
-  const mode = params.mode || "courses";
-  const items = params.items?.split(",").filter(Boolean) || [];
-  const courseFilter = params.course || null;
-
-  const [courses, professors, birdCourses] = await Promise.all([
-    getCourses(),
-    getCourseProfessors(),
-    getBirdCourses(),
-  ]);
-
+// Static shell. CompareView reads the selection from the URL and pulls only the
+// shards it needs straight from S3 in the browser — no server function runs, and
+// no data passes through Vercel's origin.
+export default function ComparePage() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-12">
       <Link
@@ -47,14 +31,9 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
         </p>
       </div>
 
-      <CompareView
-        initialMode={mode}
-        initialItems={items}
-        initialCourseFilter={courseFilter}
-        courses={courses}
-        professors={professors}
-        birdCourses={birdCourses}
-      />
+      <Suspense fallback={null}>
+        <CompareView />
+      </Suspense>
     </main>
   );
 }

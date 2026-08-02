@@ -1,56 +1,124 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { Course, CourseProfessor, BirdCourse } from "@/lib/types";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  Course,
+  CourseProfessor,
+  BirdCourse,
+  CourseIndex,
+  ProfessorIndex,
+} from "@/lib/types";
+import {
+  getCoursesIndex,
+  getProfessorsIndex,
+  getCourse,
+  getProfessorsForCourse,
+  getProfessorRecords,
+  getBirdCourses,
+} from "@/lib/api";
 import { CompareSelector } from "./CompareSelector";
 import { CourseComparison } from "./CourseComparison";
 import { ProfessorComparison } from "./ProfessorComparison";
 import { CourseProfessorComparison } from "./CourseProfessorComparison";
-import { GitCompare, BookOpen, User, Users } from "lucide-react";
+import { GitCompare, BookOpen, User, Users, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
-interface CompareViewProps {
-  initialMode: string;
-  initialItems: string[];
-  initialCourseFilter: string | null;
-  courses: Course[];
-  professors: CourseProfessor[];
-  birdCourses: BirdCourse[];
-}
 
 type CompareMode = "courses" | "professors" | "course-professors";
 
-export function CompareView({
-  initialMode,
-  initialItems,
-  initialCourseFilter,
-  courses,
-  professors,
-  birdCourses,
-}: CompareViewProps) {
+export function CompareView() {
   const router = useRouter();
-  const [mode, setMode] = useState<CompareMode>(initialMode as CompareMode);
-  const [selectedItems, setSelectedItems] = useState<string[]>(initialItems);
-  const [courseFilter, setCourseFilter] = useState<string | null>(initialCourseFilter);
+  const searchParams = useSearchParams();
 
-  // Get unique professors
-  const uniqueProfessors = useMemo(() => {
-    return Array.from(
-      new Map(professors.map((p) => [p.professor_id, p])).values()
+  const [mode, setMode] = useState<CompareMode>(
+    (searchParams.get("mode") as CompareMode) || "courses"
+  );
+  const [selectedItems, setSelectedItems] = useState<string[]>(
+    searchParams.get("items")?.split(",").filter(Boolean) || []
+  );
+  const [courseFilter, setCourseFilter] = useState<string | null>(
+    searchParams.get("course") || null
+  );
+
+  // Search indexes — small, whole-file, loaded once (browser → S3).
+  const [courseIndex, setCourseIndex] = useState<CourseIndex[]>([]);
+  const [professorIndex, setProfessorIndex] = useState<ProfessorIndex[]>([]);
+
+  // Detail shards, accumulated on demand as items are selected.
+  const [courseMap, setCourseMap] = useState<Map<string, Course>>(new Map());
+  const [courseProfsMap, setCourseProfsMap] = useState<Map<string, CourseProfessor[]>>(
+    new Map()
+  );
+  const [profRecordsMap, setProfRecordsMap] = useState<Map<string, CourseProfessor[]>>(
+    new Map()
+  );
+  const [birdCourses, setBirdCourses] = useState<BirdCourse[]>([]);
+  const [birdLoaded, setBirdLoaded] = useState(false);
+
+  // Load the search indexes once.
+  useEffect(() => {
+    let active = true;
+    getCoursesIndex().then((d) => active && setCourseIndex(d));
+    getProfessorsIndex().then((d) => active && setProfessorIndex(d));
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Bird scores are only needed for course-vs-course comparison; fetch once.
+  useEffect(() => {
+    if (mode !== "courses" || birdLoaded) return;
+    let active = true;
+    getBirdCourses().then((d) => {
+      if (!active) return;
+      setBirdCourses(d);
+      setBirdLoaded(true);
+    });
+    return () => {
+      active = false;
+    };
+  }, [mode, birdLoaded]);
+
+  // Track which shards we've already requested so we fetch each at most once.
+  const requested = useRef<Set<string>>(new Set());
+
+  const loadCourse = (code: string) => {
+    if (requested.current.has(`c:${code}`)) return;
+    requested.current.add(`c:${code}`);
+    getCourse(code).then((c) => {
+      if (c) setCourseMap((m) => new Map(m).set(code, c));
+    });
+    getProfessorsForCourse(code).then((ps) =>
+      setCourseProfsMap((m) => new Map(m).set(code, ps))
     );
-  }, [professors]);
+  };
 
-  // Update URL when selections change
+  const loadProfessor = (id: string) => {
+    if (requested.current.has(`p:${id}`)) return;
+    requested.current.add(`p:${id}`);
+    getProfessorRecords(id).then((rs) =>
+      setProfRecordsMap((m) => new Map(m).set(id, rs))
+    );
+  };
+
+  // Fetch whatever the current selection needs.
+  useEffect(() => {
+    if (mode === "courses") {
+      selectedItems.forEach(loadCourse);
+    } else if (mode === "professors") {
+      selectedItems.forEach(loadProfessor);
+    } else if (mode === "course-professors" && courseFilter) {
+      loadCourse(courseFilter);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, selectedItems, courseFilter]);
+
+  // Update URL when selections change (keeps comparisons shareable).
   const updateURL = (newMode: CompareMode, newItems: string[], newCourse: string | null) => {
     const params = new URLSearchParams();
     params.set("mode", newMode);
-    if (newItems.length > 0) {
-      params.set("items", newItems.join(","));
-    }
-    if (newCourse) {
-      params.set("course", newCourse);
-    }
+    if (newItems.length > 0) params.set("items", newItems.join(","));
+    if (newCourse) params.set("course", newCourse);
     router.replace(`/compare?${params.toString()}`, { scroll: false });
   };
 
@@ -79,6 +147,39 @@ export function CompareView({
     setSelectedItems([]);
     updateURL(mode, [], course);
   };
+
+  // Assemble the arrays the comparison components expect from the shards we hold.
+  const selectedCourses = useMemo(
+    () => selectedItems.map((code) => courseMap.get(code)).filter(Boolean) as Course[],
+    [selectedItems, courseMap]
+  );
+  const courseModeProfessors = useMemo(
+    () => selectedItems.flatMap((code) => courseProfsMap.get(code) ?? []),
+    [selectedItems, courseProfsMap]
+  );
+  const professorRecords = useMemo(
+    () => selectedItems.flatMap((id) => profRecordsMap.get(id) ?? []),
+    [selectedItems, profRecordsMap]
+  );
+  const filterCourseProfs = useMemo(
+    () => (courseFilter ? courseProfsMap.get(courseFilter) ?? [] : []),
+    [courseFilter, courseProfsMap]
+  );
+
+  // Whether every selected item's data has arrived (so we don't flash a partial view).
+  const comparisonReady = useMemo(() => {
+    if (mode === "courses") {
+      return (
+        birdLoaded &&
+        selectedItems.every((code) => courseMap.has(code) && courseProfsMap.has(code))
+      );
+    }
+    if (mode === "professors") {
+      return selectedItems.every((id) => profRecordsMap.has(id));
+    }
+    // course-professors
+    return !!courseFilter && courseProfsMap.has(courseFilter);
+  }, [mode, selectedItems, courseMap, courseProfsMap, profRecordsMap, birdLoaded, courseFilter]);
 
   const modes = [
     { id: "courses" as const, label: "Courses", icon: BookOpen },
@@ -127,49 +228,56 @@ export function CompareView({
         mode={mode}
         selectedItems={selectedItems}
         courseFilter={courseFilter}
-        courses={courses}
-        professors={uniqueProfessors}
-        allProfessors={professors}
+        courseIndex={courseIndex}
+        professorIndex={professorIndex}
+        courseProfs={filterCourseProfs}
         onAddItem={handleAddItem}
         onRemoveItem={handleRemoveItem}
         onCourseFilterChange={handleCourseFilterChange}
       />
 
-      {/* Comparison view */}
-      <AnimatePresence mode="wait">
-        {selectedItems.length >= 2 ? (
-          <motion.div
-            key="comparison"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="mt-8"
-          >
-            {mode === "courses" && (
-              <CourseComparison
-                selectedCodes={selectedItems}
-                courses={courses}
-                birdCourses={birdCourses}
-                professors={professors}
-              />
-            )}
-            {mode === "professors" && (
-              <ProfessorComparison
-                selectedIds={selectedItems}
-                professors={professors}
-              />
-            )}
-            {mode === "course-professors" && courseFilter && (
-              <CourseProfessorComparison
-                courseCode={courseFilter}
-                selectedIds={selectedItems}
-                professors={professors}
-                course={courses.find((c) => c.course_code === courseFilter)}
-              />
-            )}
-          </motion.div>
-        ) : (
+      {/* Comparison view. Loading sits outside AnimatePresence so its mode="wait"
+          only ever swaps the comparison and empty states. */}
+      {selectedItems.length >= 2 && !comparisonReady ? (
+        <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+          <Loader2 className="w-6 h-6 animate-spin mb-3" />
+          <p className="text-sm">Loading comparison…</p>
+        </div>
+      ) : (
+        <AnimatePresence mode="wait">
+          {selectedItems.length >= 2 ? (
+            <motion.div
+              key="comparison"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="mt-8"
+            >
+              {mode === "courses" && (
+                <CourseComparison
+                  selectedCodes={selectedItems}
+                  courses={selectedCourses}
+                  birdCourses={birdCourses}
+                  professors={courseModeProfessors}
+                />
+              )}
+              {mode === "professors" && (
+                <ProfessorComparison
+                  selectedIds={selectedItems}
+                  professors={professorRecords}
+                />
+              )}
+              {mode === "course-professors" && courseFilter && (
+                <CourseProfessorComparison
+                  courseCode={courseFilter}
+                  selectedIds={selectedItems}
+                  professors={filterCourseProfs}
+                  course={courseMap.get(courseFilter)}
+                />
+              )}
+            </motion.div>
+          ) : (
           <motion.div
             key="empty"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -208,8 +316,9 @@ export function CompareView({
               Use the search above to add items
             </motion.p>
           </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+      )}
     </div>
   );
 }
