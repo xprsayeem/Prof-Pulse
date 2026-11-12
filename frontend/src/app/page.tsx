@@ -3,9 +3,9 @@ import { SearchBar } from "@/components/home/SearchBar";
 import { LiveStats } from "@/components/home/LiveStats";
 import { QuickLinks } from "@/components/home/QuickLinks";
 
-// Prebuilt and cached; refreshed daily rather than re-pulling the indexes on a
-// short interval.
-export const revalidate = 86400;
+// Build-time snapshot served through Cloudflare's read-only assets cache.
+// Rebuild and deploy after publishing new exports to refresh this page.
+export const revalidate = false;
 
 export default async function Home() {
   const [stats, courses, professors] = await Promise.all([

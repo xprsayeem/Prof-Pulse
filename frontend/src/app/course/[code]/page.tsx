@@ -8,11 +8,9 @@ import { CourseStats } from "@/components/course/CourseStats";
 import { CourseProfessors } from "@/components/course/CourseProfessors";
 import { CourseTrends } from "@/components/course/CourseTrends";
 
-// Rendered on demand and cached. The export data is effectively static between
-// pipeline runs, so hold the cache for 30 days — this stops search-engine crawls
-// from regenerating thousands of pages daily. A redeploy busts the cache when the
-// data is refreshed.
-export const revalidate = 2592000;
+// Entity pages still render on demand. The build-time assets cache does not
+// persist these responses; do not schedule unsupported ISR revalidation.
+export const revalidate = 0;
 
 interface CoursePageProps {
   params: Promise<{ code: string }>;

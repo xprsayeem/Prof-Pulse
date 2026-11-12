@@ -3,6 +3,9 @@ import { BirdCoursesList } from "@/components/bird-courses/BirdCoursesList";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
+// Refresh this build-time snapshot by rebuilding and deploying after an export.
+export const revalidate = false;
+
 export const metadata = {
   title: "Bird Courses | ProfPulse",
   description: "Find the easiest courses at TMU. Courses ranked by grade distribution, difficulty, and student satisfaction.",

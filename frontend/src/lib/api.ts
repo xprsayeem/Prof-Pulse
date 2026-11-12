@@ -12,24 +12,47 @@ import {
 
 const S3_BASE = "https://prof-pulse.s3.amazonaws.com/exports";
 
-async function fetchJSON<T>(path: string, retries = 3): Promise<T[]> {
+interface FetchJSONOptions {
+  cacheAtBuild?: boolean;
+  retries?: number;
+  missingStatuses?: readonly number[];
+}
+
+class NonRetryableFetchError extends Error {}
+
+async function fetchJSON<T>(
+  path: string,
+  {
+    cacheAtBuild = false,
+    retries = 3,
+    missingStatuses = [404],
+  }: FetchJSONOptions = {}
+): Promise<T[]> {
   let lastErr: unknown;
+  let attempts = 0;
 
   for (let attempt = 1; attempt <= retries; attempt++) {
+    attempts = attempt;
+
     try {
       const res = await fetch(`${S3_BASE}/${path}.json`, {
-        // Static data exports that only change when the pipeline re-runs (and a
-        // redeploy busts this cache anyway). Cache for a day so server renders
-        // don't re-pull the same shards from S3 every few minutes.
-        next: { revalidate: 86400 },
+        // Indexes used by prerendered pages are bundled at build time. Entity
+        // shards remain live: the static-assets cache cannot store runtime writes.
+        cache: cacheAtBuild ? "force-cache" : "no-store",
       });
 
-      // A missing shard means "no data for this key" (e.g. a course with no
-      // trends, or a professor with no comment reviews) — not an error.
-      if (res.status === 404) return [];
+      if (missingStatuses.includes(res.status)) return [];
 
       if (!res.ok) {
-        throw new Error(`Failed to fetch ${path}: ${res.status}`);
+        const message = `Failed to fetch ${path}: ${res.status}`;
+
+        // Retrying permanent client errors only adds latency and Worker CPU.
+        // Timeouts and rate limits may be transient, so they can still retry.
+        if (res.status >= 400 && res.status < 500 && ![408, 429].includes(res.status)) {
+          throw new NonRetryableFetchError(message);
+        }
+
+        throw new Error(message);
       }
 
       const text = await res.text();
@@ -42,6 +65,9 @@ async function fetchJSON<T>(path: string, retries = 3): Promise<T[]> {
         .map((line) => JSON.parse(line));
     } catch (err) {
       lastErr = err;
+
+      if (err instanceof NonRetryableFetchError) break;
+
       if (attempt < retries) {
         // Backoff before retrying transient connection resets: 300ms, 600ms.
         await new Promise((resolve) => setTimeout(resolve, 300 * 2 ** (attempt - 1)));
@@ -49,7 +75,7 @@ async function fetchJSON<T>(path: string, retries = 3): Promise<T[]> {
     }
   }
 
-  throw new Error(`fetchJSON(${path}) failed after ${retries} attempts`, {
+  throw new Error(`fetchJSON(${path}) failed after ${attempts} attempt${attempts === 1 ? "" : "s"}`, {
     cause: lastErr,
   });
 }
@@ -71,7 +97,11 @@ export async function getProfessorsForCourse(courseCode: string): Promise<Course
 
 /** A single course's year-over-year trends (empty if none). */
 export async function getTrendsForCourse(courseCode: string): Promise<CourseTrend[]> {
-  return fetchJSON<CourseTrend>(`trends/${courseCode}`);
+  // The export only creates a trend shard when a course has trend rows. Public
+  // S3 access masks a missing key as 403 because callers cannot list the bucket.
+  return fetchJSON<CourseTrend>(`trends/${courseCode}`, {
+    missingStatuses: [403, 404],
+  });
 }
 
 /** A professor's per-course records (one row per course they teach). */
@@ -89,15 +119,15 @@ export async function getReviewsForProfessor(professorId: string): Promise<Revie
 // ---------------------------------------------------------------------------
 
 export async function getCoursesIndex(): Promise<CourseIndex[]> {
-  return fetchJSON<CourseIndex>("courses_index");
+  return fetchJSON<CourseIndex>("courses_index", { cacheAtBuild: true });
 }
 
 export async function getProfessorsIndex(): Promise<ProfessorIndex[]> {
-  return fetchJSON<ProfessorIndex>("professors_index");
+  return fetchJSON<ProfessorIndex>("professors_index", { cacheAtBuild: true });
 }
 
 export async function getStats(): Promise<SiteStats> {
-  const [stats] = await fetchJSON<SiteStats>("stats");
+  const [stats] = await fetchJSON<SiteStats>("stats", { cacheAtBuild: true });
   return (
     stats ?? {
       total_reviews: 0,
@@ -109,7 +139,7 @@ export async function getStats(): Promise<SiteStats> {
 }
 
 export async function getBirdCourses(): Promise<BirdCourse[]> {
-  return fetchJSON<BirdCourse>("bird_courses_gold");
+  return fetchJSON<BirdCourse>("bird_courses_gold", { cacheAtBuild: true });
 }
 
 export async function getDepartments(): Promise<Department[]> {
