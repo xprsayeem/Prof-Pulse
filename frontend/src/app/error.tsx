@@ -25,7 +25,7 @@ export default function Error({
         <h1 className="text-2xl font-bold text-white mb-2">Something went wrong</h1>
         <p className="text-white/50 mb-6">
           We couldn&apos;t load this page. The data may be temporarily
-          unavailable — please try again.
+          unavailable. Please try again.
         </p>
         <div className="flex items-center justify-center gap-3">
           <button

@@ -1,12 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Produce a static site. Course and professor data loads from public S3
+  // shards in the browser, so normal traffic never needs a Worker invocation.
+  output: "export",
 };
 
 export default nextConfig;
-
-// Wires Cloudflare bindings into `next dev` when developing against the adapter.
-// No-op in production builds.
-import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
-initOpenNextCloudflareForDev();

@@ -2,7 +2,6 @@
 
 import { CourseProfessor } from "@/lib/types";
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { Trophy, Star, TrendingDown, ThumbsUp, BookOpen, ExternalLink } from "lucide-react";
 
 interface ProfessorComparisonProps {
@@ -89,12 +88,12 @@ export function ProfessorComparison({
             transition={{ delay: index * 0.08 }}
             className="rounded-xl border border-border bg-card p-4 text-center shadow-soft"
           >
-            <Link href={`/professor/${id}`} className="group">
+            <a href={`/professor/${id}`} className="group">
               <h3 className="font-display text-xl text-foreground group-hover:text-brand transition-colors flex items-center justify-center gap-2">
                 {stats.name}
                 <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
               </h3>
-            </Link>
+            </a>
             <p className="text-muted-foreground text-sm mt-1">{stats.department}</p>
             <p className="text-muted-foreground text-xs mt-1">
               {stats.totalReviews.toLocaleString()} reviews
@@ -147,7 +146,7 @@ export function ProfessorComparison({
           {selectedProfs.map(({ id, stats }) => (
             <div key={id} className="space-y-2">
               {stats.courses.map((course) => (
-                <Link
+                <a
                   key={course.course_code}
                   href={`/course/${course.course_code}`}
                   className="block rounded-lg bg-secondary hover:bg-accent p-2 transition-colors"
@@ -156,7 +155,7 @@ export function ProfessorComparison({
                   <p className="text-muted-foreground text-xs">
                     {course.prof_avg_quality?.toFixed(1)} quality • {course.section_reviews} reviews
                   </p>
-                </Link>
+                </a>
               ))}
             </div>
           ))}

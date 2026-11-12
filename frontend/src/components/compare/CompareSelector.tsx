@@ -35,7 +35,7 @@ export function CompareSelector({
   // In "professors in course" mode the first step is picking the course.
   const pickingCourse = mode === "course-professors" && !courseFilter;
 
-  // Search suggestions — courses when picking a course or in course mode,
+  // Search suggestions: courses when picking a course or in course mode,
   // professors otherwise.
   const suggestions = useMemo(() => {
     if (query.length < 2) return [];

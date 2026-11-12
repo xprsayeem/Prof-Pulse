@@ -1,6 +1,5 @@
 import { BirdCourse, CourseIndex } from "@/lib/types";
 import { LiberalCourse } from "@/lib/liberals";
-import Link from "next/link";
 import { Star, TrendingDown, BarChart3, MessageSquare } from "lucide-react";
 
 interface LiberalCourseCardProps {
@@ -84,7 +83,7 @@ export function LiberalCourseCard({ liberal, bird, course }: LiberalCourseCardPr
   );
 
   if (hasData) {
-    return <Link href={`/course/${liberal.code}`}>{content}</Link>;
+    return <a href={`/course/${liberal.code}`}>{content}</a>;
   }
 
   return content;

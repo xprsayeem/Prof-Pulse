@@ -2,7 +2,6 @@
 
 import { Course, CourseProfessor } from "@/lib/types";
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { Trophy, Star, TrendingDown, ThumbsUp, Users, Calendar, ExternalLink } from "lucide-react";
 
 interface CourseProfessorComparisonProps {
@@ -53,12 +52,12 @@ export function CourseProfessorComparison({
     <div className="space-y-6">
       {/* Course header */}
       <div className="text-center">
-        <Link href={`/course/${courseCode}`} className="group inline-block">
+        <a href={`/course/${courseCode}`} className="group inline-block">
           <h3 className="font-display text-2xl text-foreground group-hover:text-brand transition-colors">
             Comparing professors for {courseCode}
             <ExternalLink className="w-5 h-5 inline ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
           </h3>
-        </Link>
+        </a>
         {course && (
           <p className="text-muted-foreground mt-1">
             {course.total_reviews} total reviews • {course.avg_quality?.toFixed(1)} avg quality
@@ -78,12 +77,12 @@ export function CourseProfessorComparison({
               transition={{ delay: index * 0.08 }}
               className="rounded-xl border border-border bg-card p-4 text-center shadow-soft"
             >
-              <Link href={`/professor/${prof.professor_id}`} className="group">
+              <a href={`/professor/${prof.professor_id}`} className="group">
                 <h3 className="font-display text-xl text-foreground group-hover:text-brand transition-colors flex items-center justify-center gap-2">
                   {prof.professor_name}
                   <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </h3>
-              </Link>
+              </a>
               <div className="flex items-center justify-center gap-2 mt-1">
                 {isActive && (
                   <span className="rounded-full border border-border px-2 py-0.5 text-xs font-medium text-muted-foreground">

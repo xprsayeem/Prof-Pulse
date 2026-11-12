@@ -3,7 +3,6 @@
 import { CourseProfessor } from "@/lib/types";
 import { motion } from "framer-motion";
 import { Star, TrendingUp, Users } from "lucide-react";
-import Link from "next/link";
 
 interface CourseProfessorsProps {
   professors: CourseProfessor[];
@@ -32,7 +31,7 @@ export function CourseProfessors({ professors }: CourseProfessorsProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: Math.min(index * 0.04, 0.3), duration: 0.4 }}
           >
-            <Link href={`/professor/${prof.professor_id}`}>
+            <a href={`/professor/${prof.professor_id}`}>
               <div className="h-full rounded-xl border border-border bg-card p-5 shadow-soft transition-all hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-soft-md">
                 <div className="flex items-start justify-between mb-3">
                   <div>
@@ -93,7 +92,7 @@ export function CourseProfessors({ professors }: CourseProfessorsProps) {
                   )}
                 </div>
               </div>
-            </Link>
+            </a>
           </motion.div>
         );
       })}

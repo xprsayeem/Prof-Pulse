@@ -8,7 +8,7 @@ export const metadata = {
   description: "Browse all TMU liberal studies courses with student ratings and reviews.",
 };
 
-// Static shell — LiberalsList pulls its (public, static) data straight from S3 in
+// Static shell. LiberalsList pulls its public, static data straight from S3 in
 // the browser, so this page never runs a server function or moves origin data.
 export default function LiberalsPage() {
   const lowerCount = LIBERAL_COURSES.filter((c) => c.level === "lower").length;

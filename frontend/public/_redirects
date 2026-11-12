@@ -1,0 +1,3 @@
+# Preserve the existing public URLs while serving one static client shell.
+/course/:code /course 200
+/professor/:id /professor 200

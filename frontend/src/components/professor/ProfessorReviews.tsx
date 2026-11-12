@@ -3,7 +3,6 @@
 import { Review } from "@/lib/types";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import Link from "next/link";
 import { MessageSquare, ThumbsUp, ThumbsDown, Calendar, BookOpen, Award } from "lucide-react";
 
 interface ProfessorReviewsProps {
@@ -136,13 +135,13 @@ export function ProfessorReviews({ reviews }: ProfessorReviewsProps) {
 
               {/* Course */}
               {review.course_code && (
-                <Link
+                <a
                   href={`/course/${review.course_code}`}
                   className="flex items-center gap-1 text-muted-foreground text-sm hover:text-brand transition-colors"
                 >
                   <BookOpen className="w-4 h-4" />
                   <span>{review.course_code}</span>
-                </Link>
+                </a>
               )}
 
               {/* Date */}

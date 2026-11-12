@@ -3,7 +3,6 @@
 import { CourseProfessor } from "@/lib/types";
 import { motion } from "framer-motion";
 import { Star, Users, TrendingUp } from "lucide-react";
-import Link from "next/link";
 
 interface ProfessorCoursesProps {
   courses: CourseProfessor[];
@@ -24,7 +23,7 @@ export function ProfessorCourses({ courses }: ProfessorCoursesProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: Math.min(index * 0.04, 0.3), duration: 0.4 }}
         >
-          <Link href={`/course/${course.course_code}`}>
+          <a href={`/course/${course.course_code}`}>
             <div className="h-full rounded-xl border border-border bg-card p-5 shadow-soft transition-all hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-soft-md">
               <div className="flex items-start justify-between mb-3">
                 <h3 className="text-lg font-medium text-foreground">
@@ -82,7 +81,7 @@ export function ProfessorCourses({ courses }: ProfessorCoursesProps) {
                 </div>
               )}
             </div>
-          </Link>
+          </a>
         </motion.div>
       ))}
     </div>

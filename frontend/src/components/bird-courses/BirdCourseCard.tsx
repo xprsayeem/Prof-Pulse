@@ -1,7 +1,6 @@
 "use client";
 
 import { BirdCourse } from "@/lib/types";
-import Link from "next/link";
 import { User, Award, TrendingDown, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { getLiberalCategory, getLiberalLabel } from "@/lib/liberals";
@@ -72,7 +71,7 @@ export function BirdCourseCard({ course, rank }: BirdCourseCardProps) {
   };
 
   return (
-    <Link href={`/course/${course.course_code}`}>
+    <a href={`/course/${course.course_code}`}>
       <div className="group h-full rounded-xl border border-border bg-card p-5 shadow-soft transition-all hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-soft-md">
         {/* Header row */}
         <div className="flex items-start justify-between mb-4">
@@ -181,6 +180,6 @@ export function BirdCourseCard({ course, rank }: BirdCourseCardProps) {
           </div>
         )}
       </div>
-    </Link>
+    </a>
   );
 }

@@ -40,7 +40,7 @@ export function CompareView() {
     searchParams.get("course") || null
   );
 
-  // Search indexes — small, whole-file, loaded once (browser → S3).
+  // Search indexes are small, whole-file, and loaded once (browser to S3).
   const [courseIndex, setCourseIndex] = useState<CourseIndex[]>([]);
   const [professorIndex, setProfessorIndex] = useState<ProfessorIndex[]>([]);
 
@@ -110,7 +110,6 @@ export function CompareView() {
     } else if (mode === "course-professors" && courseFilter) {
       loadCourse(courseFilter);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, selectedItems, courseFilter]);
 
   // Update URL when selections change (keeps comparisons shareable).

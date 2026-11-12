@@ -9,7 +9,7 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-// Editorial serif for headings — gives the UI a distinct voice.
+// Editorial serif for headings gives the UI a distinct voice.
 const fraunces = Fraunces({
   subsets: ["latin"],
   variable: "--font-fraunces",

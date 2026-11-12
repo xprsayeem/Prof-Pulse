@@ -3,7 +3,6 @@
 import { useState, useMemo, useRef } from "react";
 import { Search, BookOpen, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
 import { CourseIndex, ProfessorIndex } from "@/lib/types";
 import { getSubjectName } from "@/lib/courses";
 import { getLiberalTitle } from "@/lib/liberals";
@@ -18,6 +17,10 @@ interface Suggestion {
   label: string;
   sublabel: string;
   href: string;
+}
+
+function navigateToEntity(href: string) {
+  window.location.assign(new URL(href, window.location.origin));
 }
 
 function TypingIndicator() {
@@ -50,7 +53,6 @@ export function SearchBar({ courses, professors }: SearchBarProps) {
   const [isTyping, setIsTyping] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const router = useRouter();
 
   // Get unique professors
   const uniqueProfessors = useMemo(() => {
@@ -137,13 +139,13 @@ export function SearchBar({ courses, professors }: SearchBarProps) {
       setSelectedIndex((i) => (i - 1 + suggestions.length) % suggestions.length);
     } else if (e.key === "Enter") {
       if (suggestions[selectedIndex]) {
-        router.push(suggestions[selectedIndex].href);
+        navigateToEntity(suggestions[selectedIndex].href);
         setIsOpen(false);
       } else if (/^[a-z]{2,4}\d{2,4}$/i.test(query.trim())) {
         // Full course code typed with no dropdown match (e.g. a course that
-        // has no reviews yet) — go to the course page, which shows an
+        // has no reviews yet), go to the course page, which shows an
         // informative not-found if it truly doesn't exist.
-        router.push(`/course/${query.trim().toUpperCase()}`);
+        navigateToEntity(`/course/${query.trim().toUpperCase()}`);
         setIsOpen(false);
       }
     } else if (e.key === "Escape") {
@@ -215,7 +217,7 @@ export function SearchBar({ courses, professors }: SearchBarProps) {
                 <button
                   key={`${suggestion.type}-${suggestion.label}`}
                   onClick={() => {
-                    router.push(suggestion.href);
+                    navigateToEntity(suggestion.href);
                     setIsOpen(false);
                   }}
                   className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors relative ${

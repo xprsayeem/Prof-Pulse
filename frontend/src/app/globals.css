@@ -47,7 +47,7 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
 
-  /* Brand accent (ochre) — logo, links, active states, highlights */
+  /* Brand accent (ochre): logo, links, active states, highlights */
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-foreground);
 
@@ -62,7 +62,7 @@
 .light {
   --radius: 0.625rem;
 
-  /* Charcoal + ochre — warm oat canvas (never pure white), cream cards, warm
+  /* Charcoal + ochre: warm oat canvas (never pure white), cream cards, warm
      charcoal ink. Primary is a near-black charcoal (dark buttons); the brand
      accent (ochre) carries highlights, links, and active states. */
   --background: #EBE6D4;
@@ -72,7 +72,7 @@
   --popover: #F5F1E2;
   --popover-foreground: #33302B;
 
-  /* Primary — charcoal (dark actions) */
+  /* Primary: charcoal (dark actions) */
   --primary: #363330;
   --primary-foreground: #F6F2E5;
   --secondary: #E4DDC8;
@@ -82,11 +82,11 @@
   --accent: #E2DAC4;
   --accent-foreground: #363330;
 
-  /* Brand accent — ochre */
+  /* Brand accent: ochre */
   --brand: #A9762A;
   --brand-foreground: #F6F2E5;
 
-  /* Semantic — ratings & status */
+  /* Semantic: ratings and status */
   --success: oklch(0.53 0.1 150);
   --success-foreground: #F6F2E5;
   --warning: oklch(0.62 0.13 68);

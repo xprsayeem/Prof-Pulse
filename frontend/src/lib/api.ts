@@ -81,18 +81,22 @@ async function fetchJSON<T>(
 }
 
 // ---------------------------------------------------------------------------
-// Per-entity shards (Run 4a). A page fetches only the file(s) it renders.
+// Per-entity shards (Run 4a). A page fetches only the files it renders.
 // ---------------------------------------------------------------------------
 
 /** One course's metrics, or null if the course has no data. */
 export async function getCourse(courseCode: string): Promise<Course | null> {
-  const [course] = await fetchJSON<Course>(`courses/${courseCode}`);
+  const [course] = await fetchJSON<Course>(`courses/${courseCode}`, {
+    missingStatuses: [403, 404],
+  });
   return course ?? null;
 }
 
 /** The professors who teach a given course. */
 export async function getProfessorsForCourse(courseCode: string): Promise<CourseProfessor[]> {
-  return fetchJSON<CourseProfessor>(`professors_by_course/${courseCode}`);
+  return fetchJSON<CourseProfessor>(`professors_by_course/${courseCode}`, {
+    missingStatuses: [403, 404],
+  });
 }
 
 /** A single course's year-over-year trends (empty if none). */
@@ -106,16 +110,20 @@ export async function getTrendsForCourse(courseCode: string): Promise<CourseTren
 
 /** A professor's per-course records (one row per course they teach). */
 export async function getProfessorRecords(professorId: string): Promise<CourseProfessor[]> {
-  return fetchJSON<CourseProfessor>(`professors/${professorId}`);
+  return fetchJSON<CourseProfessor>(`professors/${professorId}`, {
+    missingStatuses: [403, 404],
+  });
 }
 
 /** A professor's individual reviews (empty if they have no comment reviews). */
 export async function getReviewsForProfessor(professorId: string): Promise<Review[]> {
-  return fetchJSON<Review>(`reviews/${professorId}`);
+  return fetchJSON<Review>(`reviews/${professorId}`, {
+    missingStatuses: [403, 404],
+  });
 }
 
 // ---------------------------------------------------------------------------
-// Index / summary files — light, whole-file fetches for list & search pages.
+// Index and summary files are light, whole-file fetches for list and search pages.
 // ---------------------------------------------------------------------------
 
 export async function getCoursesIndex(): Promise<CourseIndex[]> {

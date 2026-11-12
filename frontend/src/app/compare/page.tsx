@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 // Static shell. CompareView reads the selection from the URL and pulls only the
-// shards it needs straight from S3 in the browser — no server function runs, and
+// shards it needs straight from S3 in the browser. No server function runs, and
 // no data passes through Vercel's origin.
 export default function ComparePage() {
   return (

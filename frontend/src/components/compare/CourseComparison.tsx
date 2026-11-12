@@ -2,7 +2,6 @@
 
 import { Course, BirdCourse, CourseProfessor } from "@/lib/types";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
 import { Trophy, TrendingDown, ThumbsUp, Users, Star, ExternalLink } from "lucide-react";
 
 interface CourseComparisonProps {
@@ -119,12 +118,12 @@ export function CourseComparison({
             transition={{ delay: index * 0.08 }}
             className="rounded-xl border border-border bg-card p-4 text-center shadow-soft"
           >
-            <Link href={`/course/${course.course_code}`} className="group/link">
+            <a href={`/course/${course.course_code}`} className="group/link">
               <h3 className="font-display text-xl text-foreground group-hover/link:text-brand transition-colors flex items-center justify-center gap-2">
                 {course.course_code}
                 <ExternalLink className="w-4 h-4 opacity-0 group-hover/link:opacity-100 transition-opacity" />
               </h3>
-            </Link>
+            </a>
             <p className="text-muted-foreground text-sm mt-1">
               {course.total_reviews.toLocaleString()} reviews
             </p>
@@ -200,14 +199,14 @@ export function CourseComparison({
             return (
               <div key={course.course_code} className="text-center">
                 {topProf ? (
-                  <Link href={`/professor/${topProf.professor_id}`} className="group">
+                  <a href={`/professor/${topProf.professor_id}`} className="group">
                     <p className="text-foreground font-medium group-hover:text-brand transition-colors">
                       {topProf.professor_name}
                     </p>
                     <p className="text-muted-foreground text-sm">
                       {topProf.prof_avg_quality?.toFixed(1) || "N/A"} quality · {topProf.section_reviews} reviews
                     </p>
-                  </Link>
+                  </a>
                 ) : (
                   <p className="text-muted-foreground">No data</p>
                 )}
